@@ -66,7 +66,7 @@ body {
   height: 100vh;
 }
 
-.pergamino {
+#pergamino {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -74,40 +74,46 @@ body {
   margin-top: 70px;
   background-color: #ecd495;
   width: 600px;
-  height: 400px;
+  height: auto;
   font-family: General;
   border: 2px solid #936b47;
 }
-.pergamino h3 {
+
+h3 {
   text-align: center;
   font-family: General;
   padding: 5px;
 }
-.pergamino p,
-.pergamino button,
-.pergamino input {
+
+p,
+button,
+input {
   font-family: General;
   font-size: 1em;
 }
-.pergamino input {
+
+input {
   width: 80%;
   padding: 0 5px 0 5px;
 }
-.pergamino button {
+
+button {
   background-color: #936b47;
   padding: 5px;
   margin: 10px;
   width: 100px;
   text-align: center;
 }
-.pergamino p {
+
+p {
   padding: 15px;
   text-align: justify;
   max-height: 300px;
   overflow-y: scroll;
   width: 100%;
 }
-.pergamino #botonera {
+
+#botonera {
   display: flex;
   justify-content: space-evenly;
   align-items: center;
@@ -124,7 +130,7 @@ body {
   background-color: #ecd495;
   margin-left: -600px;
   margin-bottom: -104px;
-  z-index: 2;
+  z-index: 3;
   cursor: pointer;
 }
 
@@ -143,17 +149,40 @@ body {
 }
 
 #inventario {
-  z-index: 3;
-  top: 0;
+  z-index: 4;
   position: absolute;
+  top: 297px;
   border: 2px solid #936b47;
   background-color: #ecd495;
-  width: 200px;
   padding: 5px;
-  margin: 5px;
+  padding-left: 25px;
+  padding-right: 25px;
+  margin: 3px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  font-family: General;
+  font-size: 1em;
+}
+
+.flexInv {
+  display: flex;
+  flex-direction: row;
+}
+
+.right {
+  text-align: right;
+}
+
+.blurPergamino {
+  -webkit-filter: blur(1px);
+  -moz-filter: blur(1px);
+  -o-filter: blur(1px);
+  -ms-filter: blur(1px);
+  filter: blur(1px);
+  width: 100px;
+  height: 100px;
+  background-color: #ccc;
 }
 
 /*# sourceMappingURL=style.css.map */
