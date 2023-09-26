@@ -627,6 +627,7 @@ index = 0;
 id = 0;
 
 inputChecker(caminos);
+//FALTA TODA ESTA LINEA
 if (ingreso == 13) {
   alert(
     `Javastra no olvidará tu nombre. Esto traerá años de mala suerte en nuestro reino. \n\nNos has traicionado. Adiós, ${nombre}`

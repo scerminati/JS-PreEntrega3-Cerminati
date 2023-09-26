@@ -1,17 +1,6 @@
 let nombre = "";
 let sexo;
 let terminacion;
-let soga = false;
-let espada = 0;
-let final;
-let salir = false;
-let muerte = false;
-let victoria = false;
-let turnoContador = 0;
-let turno = "";
-let turnoHuida = 0;
-let logBruja = [];
-let logDragon = [];
 let bandera = 0;
 let logrosTotales = 0;
 let puntaje = 0;
@@ -198,7 +187,7 @@ let personajesHTML = document.getElementById("personajesHTML");
 let usuario = document.getElementById("usuario");
 let inventarioHTML = document.getElementById("inventario");
 let pergamino = document.getElementById("pergamino");
-let comienzo = new Date();
+
 titulo.innerText = `Selección de Personaje`;
 texto.innerText = `¡Una cordial bienvenida!\n\nQuisiera saber como puedo dirigirme a ti, ¿puedo llamarte Sir? ¿O debo llamarte Lady? Quizás simplemente debería pedirte el nombre, pero aquí en este reino tenemos esto tan cordial... tu dime.`;
 
@@ -344,7 +333,6 @@ function realizarInventario(razaPersonaje, personajeEscogido) {
   console.log(caminos);
 
   //UNA VEZ DECLARADO CAMINOS, TENGO QUE VOLVER A REALIZAR LAS FUNCIONES QUE TENGO EN EL SCRIPT ORIGINAL
-  inputChecker(caminos);
 }
 
 function crearBoton(parametro, funcionPasada) {
@@ -482,9 +470,8 @@ function declaracionDeCaminos() {
       descripcion: `¡Debes escoger tu camino! Ingresa debajo el número donde deseas dirigirte:\n\n1. Bosque.\n2. Castillo (¡Importante! No podrás regresar).\n3. Muelle`,
       categoria: "Introducción",
       input: true,
-      cantidadOpciones: 3,
-      nextid: [1, 2, 3],
-      opciones: ["Bosque", "Castillo", "Muelle"],
+      cantidadOpciones: 4,
+      nextid: [0.5, 1, 2, 3],
     },
     {
       id: 1,
@@ -501,7 +488,6 @@ function declaracionDeCaminos() {
       input: true,
       cantidadOpciones: 3,
       nextid: [0.5, 1.1, 1.2],
-      opciones: ["Regresar", "Bosque", "Cabaña"],
     },
     {
       id: 1.1,
@@ -535,7 +521,6 @@ function declaracionDeCaminos() {
       input: true,
       cantidadOpciones: 3,
       nextid: [1.01, 1.3, 1.4],
-      opciones: ["Regresar", "Sótano", "Cocina"],
     },
     {
       id: 1.3,
@@ -552,7 +537,6 @@ function declaracionDeCaminos() {
       input: true,
       cantidadOpciones: 2,
       nextid: [1.21, 1.32],
-      opciones: ["Huir", "Pelear"],
       especial: "Log Bruja",
     },
     {
@@ -635,9 +619,8 @@ function declaracionDeCaminos() {
       descripcion: `Debes escoger tu camino.\n\n1. Escapar del dragón.\n2. Enfrentar al dragón.\n`,
       categoria: "Castillo",
       input: true,
-      cantidadOpciones: 2,
-      nextid: [2.8, 2.6],
-      opciones: ["Escapar", "Pelear"],
+      cantidadOpciones: 3,
+      nextid: [2.5, 2.8, 2.6],
     },
     {
       id: 2.6,
@@ -654,7 +637,6 @@ function declaracionDeCaminos() {
       input: true,
       cantidadOpciones: 2,
       nextid: [2.8, 2.72],
-      opciones: ["Huir", "Pelear"],
       especial: "Log Dragón",
     },
     {
@@ -715,7 +697,6 @@ function declaracionDeCaminos() {
       input: true,
       cantidadOpciones: 3,
       nextid: [0.5, 3.2, 3.5],
-      opciones: ["Regresar", "Vendedor", "Muelle"],
     },
     {
       id: 3.2,
@@ -750,7 +731,6 @@ function declaracionDeCaminos() {
       input: true,
       cantidadOpciones: 2,
       nextid: [3.1, 3.6],
-      opciones: ["Regresar", "Mirar el agua"],
     },
     {
       id: 3.6,
@@ -782,255 +762,4 @@ function declaracionDeCaminos() {
     },
   ];
 }
-//ACÁ SE CAMBIA
-function inputChecker(arrayInput) {
-  resetBotonera();
-  titulo.innerText = arrayInput[index].categoria;
-  idACambiar = -1;
-  chequeoInput = false;
-  eliminar = false;
-  antesDeLogica = false;
-  textoAdicional = "";
-  descripcionEspecial = "";
-  if (arrayInput[index].especial != undefined) {
-    switch (arrayInput[index].especial) {
-      case "Voces":
-        inventario.vida = inventario.vida - 1;
-        registroLogro("Voces");
-        if (inventario.vida <= 0) {
-          arrayInput[index].nextid[0] = arrayInput[index].nextid[1];
-        }
-        break;
-      case "Monedas":
-        inventario.monedas += 10;
-        descripcionEspecial = `Ya exploraste este lugar, te recomiendo que busques en otro lado.`;
-        idACambiar = arrayInput[index].id;
-        eliminar = true;
-        puntaje += 10;
 
-        break;
-      case "Combate Bruja":
-        combate(bruja);
-        logBruja.push(turno);
-        textoAdicional = `\n\nLa bruja tiene ${bruja.vida} puntos de vida.`;
-        if (muerte) {
-          arrayInput[index].nextid[0] = arrayInput[index].nextid[1];
-        } else if (victoria) {
-          arrayInput[index].nextid[0] = arrayInput[index].nextid[2];
-          victoria = false;
-          registroLogro("Bruja");
-          eliminar = true;
-          idACambiar = 1.3;
-          descripcionEspecial = `Ya has derrotado a la bruja, no hay nada más que ver aquí`;
-          modificarNextId(arrayInput, idACambiar, [1.21]);
-          turno = "";
-          turnoContador = 0;
-          inventario.combate += 2;
-          inventario.vida = healthBase + 5;
-        }
-        break;
-      case "Log Bruja":
-        antesDeLogica = true;
-        descripcionEspecial = arrayInput[index].descripcion + `\n` + turno;
-        idACambiar = arrayInput[index].id;
-        break;
-      case "Vendedor":
-        if (inventario.monedas == 10) {
-          arrayInput[index].nextid[0] = arrayInput[index].nextid[1];
-          registroLogro("Soga");
-          inventario.monedas -= 10;
-        }
-        break;
-      case "Soga":
-        idACambiar = 3.2;
-        descripcionEspecial = `"Buenos días, ${nombre}, recuerde que ya no tengo nada para ofrecerle. Solo quería entablar una conversación con usted."`;
-        eliminar = true;
-        modificarNextId(arrayInput, idACambiar, [3.1]);
-        soga = true;
-        inventario.herramientas = "Soga";
-        break;
-      case "Espada":
-        espada++;
-        if (espada == 2) {
-          idACambiar = 3.5;
-
-          modificarNextId(arrayInput, idACambiar, [3.1, 3.7]);
-        }
-        break;
-      case "Log Espada":
-        registroLogro("Espada");
-        inventario.armas = "Espada";
-        idACambiar = 3.6;
-        descripcionEspecial = `Ya no hay nada que ver aquí, puedes regresar.`;
-        eliminar = true;
-        modificarNextId(arrayInput, idACambiar, [3.1]);
-        modificarNextId(arrayInput, 3.5, [3.1, 3.6]);
-        alert(
-          "¡Hay algo en el agua! Un brillo, un artefacto extraño. Te lanzas al agua sin pensarlo."
-        );
-        alert("Te zambulles. Aguantas la respiración.");
-        alert("Todavía no llegas, aguanta un poco más.");
-        alert("¡Estira la mano! ¡Ya casi!");
-        alert("...");
-        alert("...");
-        alert("...");
-
-        inventario.combate += 5;
-        break;
-      case "Puente":
-        if (soga) {
-          arrayInput[index].nextid[0] = arrayInput[index].nextid[1];
-          registroLogro("Puente");
-        } else {
-          inventario.vida -= 3;
-        }
-        break;
-      case "Combate Dragón":
-        combate(dragon);
-        logDragon.push(turno);
-        textoAdicional = `\n\nEl dragón tiene ${dragon.vida} puntos de vida.`;
-        if (muerte) {
-          arrayInput[index].nextid[0] = arrayInput[index].nextid[1];
-        } else if (victoria) {
-          arrayInput[index].nextid[0] = arrayInput[index].nextid[2];
-          registroLogro("Dragón");
-        }
-        break;
-      case "Log Dragón":
-        antesDeLogica = true;
-        descripcionEspecial = arrayInput[index].descripcion + `\n` + turno;
-        idACambiar = arrayInput[index].id;
-        break;
-      case "Huida":
-        turnoHuida++;
-        inventario.vida =
-          inventario.vida - Math.ceil((Math.random() * dragon.combate) / 2);
-
-        if (inventario.vida <= 0 && turnoHuida <= 5) {
-          arrayInput[index].nextid[0] = arrayInput[index].nextid[1];
-          descripcionEspecial = `¡El dragón te ha derrotado! Te has quedado sin vida.\n\nFIN DEL JUEGO.`;
-          antesDeLogica = true;
-          idACambiar = 2.8;
-        } else if (inventario.vida > 0 && turnoHuida <= 5) {
-          descripcionEspecial =
-            arrayInput[index].descripcion +
-            `\n Turno ${turnoHuida}: Tienes ${inventario.vida} puntos de vida.`;
-          antesDeLogica = true;
-          idACambiar = 2.8;
-        }
-        if (turnoHuida == 5) {
-          arrayInput[index].nextid[0] = arrayInput[index].nextid[2];
-          puntaje += 10;
-        }
-        break;
-      case "Fin":
-        salir = true;
-        chequeoInput = true;
-        final = new Date();
-        break;
-    }
-  }
-  if (antesDeLogica) {
-    descripcionChecker(arrayInput, eliminar, idACambiar);
-  }
-
-  if (arrayInput[index].input) {
-    texto.innerText = arrayInput[index].descripcion;
-    for (let i = 0; i < arrayInput[index].cantidadOpciones; i++) {
-      crearBoton(arrayInput[index].opciones[i], () => {
-        if (!antesDeLogica) {
-          descripcionChecker(arrayInput, eliminar, idACambiar);
-        }
-        nextIndex(arrayInput, i);
-        inputChecker(arrayInput);
-      });
-    }
-  } else {
-    texto.innerText = arrayInput[index].descripcion + textoAdicional;
-    crearBoton("Siguiente", () => {
-      if (!salir) {
-        if (!antesDeLogica) {
-          descripcionChecker(arrayInput, eliminar, idACambiar);
-        }
-        nextIndex(arrayInput, 0);
-        inputChecker(arrayInput);
-      }
-    });
-  }
-}
-
-function nextIndex(arrayInput, numeroID) {
-  id = arrayInput[index].nextid;
-  index = arrayInput.findIndex((camino) => {
-    return camino.id === id[numeroID];
-  });
-}
-
-function descripcionChecker(arrayInput, eliminarEspecial, idACambiar) {
-  i = arrayInput.findIndex((camino) => {
-    return camino.id == idACambiar;
-  });
-
-  if (descripcionEspecial != "") {
-    arrayInput[i].descripcion = descripcionEspecial;
-    if (eliminarEspecial) {
-      delete arrayInput[i].especial;
-    }
-  }
-}
-
-function modificarNextId(arrayInput, nextIDacambiar, nextID) {
-  i = arrayInput.findIndex((camino) => {
-    return camino.id == nextIDacambiar;
-  });
-  arrayInput[i].nextid = nextID;
-}
-
-function combate(oponente) {
-  iniciativaPropia = Math.ceil(Math.random() * inventario.iniciativa);
-  iniciativaOponente = Math.ceil(Math.random() * oponente.iniciativa);
-  if (iniciativaPropia > iniciativaOponente) {
-    primero = inventario;
-    ini = true;
-    segundo = oponente;
-  } else {
-    primero = oponente;
-    ini = false;
-    segundo = inventario;
-  }
-  danoASegundo =
-    Math.ceil(Math.random() * primero.combate) -
-    Math.ceil(Math.random() * segundo.combate);
-  if (danoASegundo <= 1) {
-    danoASegundo = 1;
-  }
-  segundo.vida -= danoASegundo;
-  if (segundo.vida <= 0) {
-    if (ini) {
-      victoria = true;
-    } else {
-      muerte = true;
-    }
-  } else {
-    danoAPrimero =
-      Math.ceil(Math.random() * segundo.combate) -
-      Math.ceil(Math.random() * primero.combate);
-    if (danoAPrimero <= 1) {
-      danoAPrimero = 1;
-    }
-    primero.vida -= danoAPrimero;
-  }
-  if (primero.vida <= 0) {
-    if (ini) {
-      muerte = true;
-    } else {
-      victoria = true;
-    }
-  }
-  turnoContador++;
-  if (ini) {
-    turno = `Turno ${turnoContador}:\nIniciativa: ${primero.nombre}. Daño Hecho: ${danoASegundo}. Daño Recibido: ${danoAPrimero}. Vida de ${oponente.nombre}: ${oponente.vida}.`;
-  } else {
-    turno = `Turno ${turnoContador}:\nIniciativa: ${primero.nombre}. Daño Hecho: ${danoAPrimero}. Daño Recibido: ${danoASegundo}. Vida de ${oponente.nombre}: ${oponente.vida}.`;
-  }
-}
