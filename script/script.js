@@ -16,7 +16,7 @@ let cordialidad = [
 let personajes = [
   {
     raza: "Humano",
-    nombre: "Caballero",
+    clase: "Caballero",
     vida: 13,
     iniciativa: 0,
     combate: 2,
@@ -24,7 +24,7 @@ let personajes = [
   },
   {
     raza: "Humano",
-    nombre: "Rogue",
+    clase: "Rogue",
     vida: 10,
     iniciativa: 4,
     combate: 3,
@@ -32,7 +32,7 @@ let personajes = [
   },
   {
     raza: "Humano",
-    nombre: "Cazador",
+    clase: "Cazador",
     vida: 7,
     iniciativa: 5,
     combate: 6,
@@ -40,7 +40,7 @@ let personajes = [
   },
   {
     raza: "Elfo",
-    nombre: "Bardo",
+    clase: "Bardo",
     vida: 8,
     iniciativa: 5,
     combate: 2,
@@ -48,7 +48,7 @@ let personajes = [
   },
   {
     raza: "Elfo",
-    nombre: "Guerrero",
+    clase: "Guerrero",
     vida: 10,
     iniciativa: 2,
     combate: 7,
@@ -56,7 +56,7 @@ let personajes = [
   },
   {
     raza: "Elfo",
-    nombre: "Profeta",
+    clase: "Profeta",
     vida: 9,
     iniciativa: 3,
     combate: 5,
@@ -64,7 +64,7 @@ let personajes = [
   },
   {
     raza: "Elfo",
-    nombre: "Monje",
+    clase: "Monje",
     vida: 12,
     iniciativa: 2,
     combate: 2,
@@ -72,7 +72,7 @@ let personajes = [
   },
   {
     raza: "Elfo",
-    nombre: "Asesino",
+    clase: "Asesino",
     vida: 11,
     iniciativa: 6,
     combate: 3,
@@ -80,7 +80,7 @@ let personajes = [
   },
   {
     raza: "Orco",
-    nombre: "Arquero",
+    clase: "Arquero",
     vida: 12,
     iniciativa: 0,
     combate: 5,
@@ -88,7 +88,7 @@ let personajes = [
   },
   {
     raza: "Orco",
-    nombre: "Herrero",
+    clase: "Herrero",
     vida: 9,
     iniciativa: 4,
     combate: 6,
@@ -96,7 +96,7 @@ let personajes = [
   },
   {
     raza: "Orco",
-    nombre: "Asaltador",
+    clase: "Asaltador",
     vida: 7,
     iniciativa: 6,
     combate: 4,
@@ -104,7 +104,7 @@ let personajes = [
   },
   {
     raza: "Orco",
-    nombre: "Destructor",
+    clase: "Destructor",
     vida: 9,
     iniciativa: 2,
     combate: 7,
@@ -112,7 +112,7 @@ let personajes = [
   },
   {
     raza: "Enano",
-    nombre: "Artesano",
+    clase: "Artesano",
     vida: 11,
     iniciativa: 1,
     combate: 2,
@@ -120,7 +120,7 @@ let personajes = [
   },
   {
     raza: "Enano",
-    nombre: "Carroñero",
+    clase: "Carroñero",
     vida: 8,
     iniciativa: 4,
     combate: 3,
@@ -128,7 +128,7 @@ let personajes = [
   },
   {
     raza: "Mago",
-    nombre: "Profeta",
+    clase: "Profeta",
     vida: 13,
     iniciativa: 3,
     combate: 4,
@@ -136,18 +136,37 @@ let personajes = [
   },
   {
     raza: "Mago",
-    nombre: "Nigromante",
+    clase: "Nigromante",
     vida: 10,
     iniciativa: 1,
     combate: 5,
     defensa: 4,
   },
 ];
+let inventario = [];
+
+personajes.forEach((personaje) => {
+  let razaP = personaje.raza;
+  razaP = razaP.toLowerCase();
+  let sexoP = ["m", "f"];
+  personaje.imagen = [];
+  for (let index = 0; index < sexoP.length; index++) {
+    personaje.imagen[index] = {
+      sexo: sexoP[index],
+      ruta: `<img src="./images/${razaP}${sexoP[index]}.png" />`,
+    };
+  }
+});
+
+console.log(personajes);
 
 let texto = document.getElementById("texto");
 let botonera = document.getElementById("botonera");
 let titulo = document.getElementById("titulo");
 let input = document.getElementById("input");
+let personajesHTML = document.getElementById("personajesHTML");
+let usuario = document.getElementById("usuario");
+let inventarioHTML = document.getElementById("inventario");
 
 titulo.innerText = `Introducción`;
 texto.innerText = `¡Una cordial bienvenida!\n\nQuisiera saber como puedo dirigirme a ti, ¿puedo llamarte Sir? ¿O debo llamarte Lady? Quizás simplemente debería pedirte el nombre, pero aquí en este reino tenemos esto tan cordial... tu dime.`;
@@ -177,6 +196,11 @@ function setNombre(id) {
   botonera.innerHTML = ``;
   crearBoton("Borrar", borrarInput);
   crearBoton("Enviar", enviarInput);
+  input.addEventListener("keyup", function (e) {
+    if (e.key === "Enter") {
+      enviarInput();
+    }
+  });
 }
 
 function borrarInput() {
@@ -185,9 +209,7 @@ function borrarInput() {
 
 function enviarInput() {
   bandera++;
-  if (input.value == "" && bandera < 3) {
-    texto.innerText = `¡No quieras escaparte! Necesito tu nombre, prometo que no es para realizar un hechizo.\n\nPor favor, introduce tu nombre.`;
-  } else if (input.value != "") {
+  if (input.value != "") {
     let nombreMayus = input.value.toLowerCase();
     nombreMayus = nombreMayus.replace(
       nombreMayus[0],
@@ -195,29 +217,97 @@ function enviarInput() {
     );
     nombre += nombreMayus;
     texto.innerText = `¡${nombre}! ¡Muchas gracias por confiarme tu nombre! Ya el pueblo comienza a nombrarte, parece que en tus tierras eres famos${terminacion}.`;
-  } else if (bandera == 3) {
+  } else {
+    texto.innerText = `¡No quieras escaparte! Necesito tu nombre, prometo que no es para realizar un hechizo.\n\nPor favor, introduce tu nombre.`;
+  }
+
+  if (bandera == 3) {
     nombre += `Anónim${terminacion}`;
     registroLogro("Nombre");
     texto.innerText = `Parece que no confias en mi, no empezamos bien entonces. Te llamaré de ahora en más, ${nombre}.`;
   }
-  input.classList.toggle("oculto");
-  botonera.innerHTML = "";
-  texto.innerText += `\n\nPor último, deberás escoger una raza. Dime, ¿con qué raza crees que te identificas más?`;
-  let categoriaRazas = [];
-  personajes.forEach((personaje) => {
-    if (!categoriaRazas.includes(personaje.raza)) {
-      categoriaRazas.push(personaje.raza);
-    }
-  });
+  if (input.value != "" || bandera == 3) {
+    input.classList.toggle("oculto");
+    botonera.innerHTML = "";
+    texto.innerText += `\n\nPor último, deberás escoger una raza. Dime, ¿con qué raza crees que te identificas más?`;
+    let categoriaRazas = [];
+    personajes.forEach((personaje) => {
+      if (!categoriaRazas.includes(personaje.raza)) {
+        categoriaRazas.push(personaje.raza);
+      }
+    });
 
-  for (let index = 0; index < categoriaRazas.length; index++) {
-    crearBoton(categoriaRazas[index], () =>
-      seleccionarRaza(categoriaRazas[index])
-    );
+    for (let index = 0; index < categoriaRazas.length; index++) {
+      crearBoton(categoriaRazas[index], () =>
+        seleccionarRaza(categoriaRazas[index])
+      );
+    }
   }
 }
 
+function seleccionarRaza(razaSeleccionada) {
+  let razaPersonaje = personajes.filter(
+    (personaje) => personaje.raza == razaSeleccionada
+  );
+  botonera.innerHTML = "";
+  texto.innerText = `Haz escogido la raza ${razaPersonaje[0].raza}. Ahora, a continuación tienes las habilidades de los siguientes trabajos. Debes escoger uno para continuar.`;
 
+  let personajesAElegir = "";
+  personajesHTML.classList.toggle("oculto");
+  personajesHTML.innerHTML = "";
+  razaPersonaje.forEach((personaje) => {
+    personajesAElegir = "";
+    let personajeCaja = document.createElement("div");
+    for (const propiedad in personaje) {
+      if (propiedad != "raza" && propiedad != "imagen") {
+        personajesAElegir += `<b>${propiedad.replace(
+          propiedad[0],
+          propiedad[0].toUpperCase()
+        )}:</b> ${personaje[propiedad]}<br>`;
+      }
+    }
+    personajesAElegir += `\n`;
+    personajeCaja.innerHTML = personajesAElegir;
+    personajesHTML.appendChild(personajeCaja);
+  });
+  razaPersonaje.forEach((personaje) => {
+    crearBoton(personaje.clase, () =>
+      realizarInventario(razaPersonaje, personaje.clase)
+    );
+  });
+  console.log(razaPersonaje);
+}
+
+function realizarInventario(razaPersonaje, personajeEscogido) {
+  console.log(personajeEscogido);
+  console.log(razaPersonaje);
+  let usuarioEscogido = razaPersonaje.find(
+    (personaje) => personaje.clase === personajeEscogido
+  );
+  let imagenPersonaje = usuarioEscogido.imagen.find(
+    (imagen) => imagen.sexo === sexo
+  );
+  console.log(imagenPersonaje);
+  console.log(usuarioEscogido);
+  inventario = {
+    nombre,
+    raza: usuarioEscogido.raza,
+    clase: usuarioEscogido.clase,
+    vida: usuarioEscogido.vida,
+    iniciativa: usuarioEscogido.iniciativa,
+    combate: usuarioEscogido.combate,
+    defensa: usuarioEscogido.defensa,
+    armas: "-",
+    herramientas: "-",
+    monedas: 0,
+  };
+
+  console.log(inventario);
+  usuario.classList.toggle("oculto");
+  usuario.innerHTML = imagenPersonaje.ruta;
+  botonera.innerHTML = "";
+  usuario.addEventListener("click", mostrarInventario);
+}
 
 function crearBoton(parametro, funcionPasada) {
   window["boton" + parametro] = document.createElement("button");
@@ -225,6 +315,28 @@ function crearBoton(parametro, funcionPasada) {
   window["boton" + parametro].id = parametro.toLowerCase();
   botonera.appendChild(window["boton" + parametro]);
   window["boton" + parametro].addEventListener("click", funcionPasada);
+}
+
+function mostrarInventario() {
+  inventarioHTML.classList.toggle("oculto");
+  let inventarioAMostrar = "<h3>Inventario</h3><br><div>";
+  for (const propiedad in inventario) {
+    inventarioAMostrar += `<b>${propiedad.replace(
+      propiedad[0],
+      propiedad[0].toUpperCase()
+    )}:</b> ${inventario[propiedad]}</br>`;
+  }
+
+  inventarioAMostrar += `\n</div>`;
+  inventarioHTML.innerHTML = inventarioAMostrar;
+  let botonInventario = document.createElement("button");
+  botonInventario.innerText = "Volver";
+  botonInventario.addEventListener("click", ocultarInventario);
+  inventarioHTML.appendChild(botonInventario);
+}
+
+function ocultarInventario() {
+  inventarioHTML.classList.toggle("oculto");
 }
 
 function registroLogro(id) {
