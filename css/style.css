@@ -108,7 +108,7 @@ button {
 p {
   padding: 15px;
   text-align: justify;
-  max-height: 300px;
+  max-height: 320px;
   overflow-y: scroll;
   width: 100%;
 }

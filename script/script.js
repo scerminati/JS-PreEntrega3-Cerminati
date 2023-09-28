@@ -14,7 +14,7 @@ let logBruja = [];
 let logDragon = [];
 let bandera = 0;
 let logrosTotales = 0;
-let puntaje = 0;
+let puntaje = 100;
 let logros = [`\n- *`, `\n- *`, `\n- *`, `\n- *`, `\n- *`, `\n- *`];
 let logrosID = [false, false, false, false, false, false];
 let cordialidad = [
@@ -954,6 +954,33 @@ function inputChecker(arrayInput) {
         }
         nextIndex(arrayInput, 0);
         inputChecker(arrayInput);
+      } else {
+        resetBotonera();
+        for (let index = 0; index < logros.length; index++) {
+          logros[index] = logros[index].replace(`*`, `LOGRO BLOQUEADO.`);
+        }
+
+        let tiempoTotal = final - comienzo;
+        tiempoTotal = Math.round(tiempoTotal / 1000);
+        let unidad = `segundos`;
+        if (tiempoTotal > 120) {
+          tiempoTotal = Math.round(tiempoTotal / 60);
+          unidad = `minutos`;
+        }
+        texto.innerText = `${nombre} del reino ${
+          inventario.raza
+        }, aquí tus estadísticas de juego.\n\nHas conseguido un puntaje total de ${puntaje}/100.\n\nLogros obtenidos durante la aventura:\n${logros.join(
+          " "
+        )}\n\nObtuviste un total de ${logrosTotales} de ${
+          logros.length
+        } logros.\n\nEl tiempo total de aventura fue de ${tiempoTotal} ${unidad}.`;
+        //CLEAR DATA
+        if (puntaje == 100) {
+          crearBoton("Siguiente", () => {
+            texto.innerText = `¡JUEGO PERFECTO EN PUNTAJE! Felicidades, ${nombre} del reino ${inventario.raza}, tu nombre será recordado, lamentablemente, por poco tiempo, porque nos quedamos sin tinta para ponerlo en los registros del pueblo.\n\nSin embargo, siempre puedes sacar un ScreenShot de tu resultado y enviarmela.\n\n¡Gracias por jugar!`;
+            resetBotonera();
+          });
+        }
       }
     });
   }
