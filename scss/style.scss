@@ -92,6 +92,7 @@ button,
 input {
   font-family: General;
   font-size: 1em;
+  color: black;
 }
 
 input {
@@ -176,6 +177,7 @@ p {
   text-align: right;
 }
 
+.center{text-align: center;}
 
 .blurPergamino {
   -webkit-filter: blur(1px);
@@ -186,4 +188,10 @@ p {
   width: 100px;
   height: 100px;
   background-color: #ccc;
+}
+
+#botonmail {
+  background-color: black;
+  width: 50px;
+  height: 50px;
 }
