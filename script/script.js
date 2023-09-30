@@ -23,6 +23,7 @@ let nombre,
   caminos,
   index,
   id,
+  idActual,
   chequeoInput,
   bruja,
   dragon;
@@ -178,56 +179,6 @@ personajes.forEach((personaje) => {
     };
   }
 });
-
-// Inicialización de variables globales disponibles para reset.
-bandera = 0;
-nombre = "";
-espada = 0;
-salir = false;
-muerte = false;
-victoria = false;
-turno = "";
-turnoContador = Number(localStorage.getItem("turnoContador")) || 0;
-logBruja = JSON.parse(localStorage.getItem("logBruja")) || [];
-bruja = JSON.parse(localStorage.getItem("bruja")) || {
-  nombre: "Bruja",
-  vida: 8,
-  iniciativa: 10,
-  combate: 2,
-  defensa: 2,
-};
-turnoHuida = Number(localStorage.getItem("turnoHuida")) || 0;
-logDragon = JSON.parse(localStorage.getItem("logDragon")) || [];
-dragon = JSON.parse(localStorage.getItem("dragon")) || {
-  nombre: "Dragón",
-  vida: 15,
-  iniciativa: 3,
-  combate: 4,
-  defensa: 4,
-};
-logrosTotales = Number(localStorage.getItem("logrosTotales")) || 0;
-puntaje = Number(localStorage.getItem("puntaje")) || 0;
-logros = JSON.parse(localStorage.getItem("logros")) || [
-  `\n- *`,
-  `\n- *`,
-  `\n- *`,
-  `\n- *`,
-  `\n- *`,
-  `\n- *`,
-];
-logrosID = JSON.parse(localStorage.getItem("logrosID")) || [
-  false,
-  false,
-  false,
-  false,
-  false,
-  false,
-];
-index = Number(localStorage.getItem("index")) || 0;
-id = localStorage.getItem("id") || -1;
-comienzo = Date.parse(localStorage.getItem("comienzo")) || new Date();
-console.log(comienzo);
-
 //Levantar todos los elementos de DOM
 let texto = document.getElementById("texto");
 let botonera = document.getElementById("botonera");
@@ -235,53 +186,115 @@ let titulo = document.getElementById("titulo");
 let input = document.getElementById("input");
 let personajesHTML = document.getElementById("personajesHTML");
 let usuario = document.getElementById("usuario");
+let oponente = document.getElementById("oponente");
 let inventarioHTML = document.getElementById("inventario");
 let pergamino = document.getElementById("pergamino");
 
-//Inicio de selección de personaje
-if (id == -1) {
-  titulo.innerText = `Selección de Personaje`;
-  texto.innerText = `¡Una cordial bienvenida!\n\nQuisiera saber como puedo dirigirme a ti, ¿puedo llamarte Sir? ¿O debo llamarte Lady? Quizás simplemente debería pedirte el nombre, pero aquí en este reino tenemos esto tan cordial... tu dime.`;
-  for (let index = 0; index < cordialidad.length; index++) {
-    crearBoton(cordialidad[index].titulo, () => setNombre(index));
+inicio();
+
+// Inicialización de variables globales disponibles para reset.
+function inicio() {
+  resetBotonera();
+  usuario.classList.add("oculto");
+  oponente.classList.add("oculto");
+  personajesHTML.classList.add("oculto");
+  bandera = 0;
+  nombre = "";
+  terminacion = localStorage.getItem("terminacion") || "";
+  espada = Number(localStorage.getItem("espada")) || 0;
+  salir = false;
+  muerte = false;
+  victoria = false;
+  turno = "";
+  turnoContador = Number(localStorage.getItem("turnoContador")) || 0;
+  logBruja = JSON.parse(localStorage.getItem("logBruja")) || [];
+  bruja = JSON.parse(localStorage.getItem("bruja")) || {
+    nombre: "Bruja",
+    vida: 8,
+    iniciativa: 10,
+    combate: 2,
+    defensa: 2,
+    ruta: `<img src="./images/bruja.png" />`,
+  };
+  turnoHuida = Number(localStorage.getItem("turnoHuida")) || 0;
+  logDragon = JSON.parse(localStorage.getItem("logDragon")) || [];
+  dragon = JSON.parse(localStorage.getItem("dragon")) || {
+    nombre: "Dragón",
+    vida: 15,
+    iniciativa: 3,
+    combate: 4,
+    defensa: 4,
+    ruta: `<img src="./images/dragon.png" />`,
+  };
+  logrosTotales = Number(localStorage.getItem("logrosTotales")) || 0;
+  puntaje = Number(localStorage.getItem("puntaje")) || 0;
+  logros = JSON.parse(localStorage.getItem("logros")) || [
+    `<br>- *`,
+    `<br>- *`,
+    `<br>- *`,
+    `<br>- *`,
+    `<br>- *`,
+    `<br>- *`,
+  ];
+  logrosID = JSON.parse(localStorage.getItem("logrosID")) || [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+  ];
+  index = Number(localStorage.getItem("index")) || 0;
+  id = JSON.parse(localStorage.getItem("id")) || -1;
+  idActual = localStorage.getItem("idActual", idActual) || 0;
+  comienzo = Date.parse(localStorage.getItem("comienzo")) || new Date();
+  console.log(comienzo);
+
+  //Inicio de selección de personaje
+  if (id == -1) {
+    titulo.innerText = `Selección de Personaje`;
+    texto.innerHTML = `¡Una cordial bienvenida!<br><br>Quisiera saber como puedo dirigirme a ti, ¿puedo llamarte Sir? ¿O debo llamarte Lady? Quizás simplemente debería pedirte el nombre, pero aquí en este reino tenemos esto tan cordial... tu dime.<br><br>Selecciona la opción que más te guste.`;
+    for (let index = 0; index < cordialidad.length; index++) {
+      crearBoton(cordialidad[index].titulo, () => setNombre(index));
+    }
+  } else {
+    caminos = JSON.parse(localStorage.getItem("caminos"));
+    console.log(caminos[33]);
+    inventario = JSON.parse(localStorage.getItem("inventario"));
+    healthBase = Number(localStorage.getItem("healthBase"));
+    usuario.classList.toggle("oculto");
+    usuario.innerHTML = localStorage.getItem("usuarioImagen");
+    personajesHTML.classList.toggle("oculto");
+    usuario.addEventListener("click", mostrarInventario);
+    inputChecker(caminos);
   }
-} else {
-  caminos = JSON.parse(localStorage.getItem("caminos"));
-  console.log(caminos[33]);
-  inventario = JSON.parse(localStorage.getItem("inventario"));
-  healthBase = localStorage.getItem("healthBase");
-  usuario.classList.toggle("oculto");
-  usuario.innerHTML = localStorage.getItem("usuarioImagen");
-  personajesHTML.classList.toggle("oculto");
-  usuario.addEventListener("click", mostrarInventario);
-  inputChecker(caminos);
 }
 
 function setNombre(id) {
   nombre = cordialidad[id].titulo;
   sexo = cordialidad[id].sexo;
+  terminacion = "o";
   if (id == 4) {
     nombre = "";
-    texto.innerText = `De acuerdo, no utilizaré ningún título para dirigirme a ti.`;
+    texto.innerHTML = `De acuerdo, no utilizaré ningún título para dirigirme a ti.`;
   } else {
-    if (sexo == "m") {
-      terminacion = "o";
-    } else {
+    if (sexo == "f") {
       terminacion = "a";
     }
+    console.log(terminacion);
+    localStorage.setItem("terminacion", terminacion);
     nombre += " ";
-    texto.innerText = `¡Ahora sí! Bienvenid${terminacion}, ${nombre}.`;
+    texto.innerHTML = `¡Este es un buen comienzo! Bienvenid${terminacion}, ${nombre}.`;
   }
 
-  texto.innerText += `\n\nIntroduce tu nombre aquí debajo. ¡No te preocupes! No estarás firmando ningún contrato...\n\nPor ahora.`;
+  texto.innerHTML += `<br><br>Introduce tu nombre aquí debajo. ¡No te preocupes! No estarás firmando ningún contrato...<br><br>Por ahora.`;
   input.classList.toggle("oculto");
   resetBotonera();
   crearBoton("Borrar", borrarInput);
   crearBoton("Enviar", enviarInput);
-  input.addEventListener("keyup", function (e) {
-    if (e.key === "Enter") {
-      enviarInput();
-    }
+  input.addEventListener("keyup", (e) => {
+    console.log(e.key);
+    e.key === "Enter" && enviarInput();
   });
 }
 
@@ -298,20 +311,21 @@ function enviarInput() {
       nombreMayus[0].toUpperCase()
     );
     nombre += nombreMayus;
-    texto.innerText = `¡${nombre}! ¡Muchas gracias por confiarme tu nombre! Ya el pueblo comienza a nombrarte, parece que en tus tierras eres famos${terminacion}.`;
+    texto.innerHTML = `¡${nombre}! ¡Muchas gracias por confiarme tu nombre! Ya el pueblo comienza a nombrarte, parece que en tus tierras eres famos${terminacion}.`;
   } else {
-    texto.innerText = `¡No quieras escaparte! Necesito tu nombre, prometo que no es para realizar un hechizo.\n\nPor favor, introduce tu nombre.`;
+    texto.innerHTML = `¡No quieras escaparte de mi! Necesito tu nombre, prometo que no es para realizar un hechizo.<br><br>Por favor, introduce tu nombre.`;
   }
 
   if (bandera == 3) {
     nombre += `Anónim${terminacion}`;
     registroLogro("Nombre");
-    texto.innerText = `Parece que no confias en mi, no empezamos bien entonces. Te llamaré de ahora en más, ${nombre}.`;
+    texto.innerHTML = `Parece que no confias en mi, no estamos empezando bien entonces. Te llamaré de ahora en más ${nombre}. Tu nombre no es tan conocido en el reino, y a medida que se esparce la voz, generas desconfianza entre la gente.`;
   }
   if (input.value != "" || bandera == 3) {
     input.classList.toggle("oculto");
     resetBotonera();
-    texto.innerText += `\n\nPor último, deberás escoger una raza. Dime, ¿con qué raza crees que te identificas más?`;
+    input.value = "";
+    texto.innerHTML += `<br><br>Por último, deberás escoger una raza. Dime, ¿con cuál de las siguientes razas crees que te identificas más?`;
     let categoriaRazas = [];
     personajes.forEach((personaje) => {
       if (!categoriaRazas.includes(personaje.raza)) {
@@ -332,8 +346,8 @@ function seleccionarRaza(razaSeleccionada) {
     (personaje) => personaje.raza == razaSeleccionada
   );
   resetBotonera();
-  texto.innerText = `Haz escogido la raza ${razaPersonaje[0].raza}. Ahora, a continuación tienes las habilidades de los siguientes trabajos. Debes escoger uno para continuar.`;
-
+  texto.innerHTML = `Haz escogido la raza ${razaPersonaje[0].raza}. A continuación las clases más comunes de esta raza. Debes escoger uno para continuar.`;
+  //AÑADIR COMENTARIO DE CADA UNA DE LAS HABILIDADES
   let personajesAElegir = "";
   personajesHTML.classList.toggle("oculto");
   personajesHTML.innerHTML = "";
@@ -348,7 +362,7 @@ function seleccionarRaza(razaSeleccionada) {
         )}:</b> ${personaje[propiedad]}<br>`;
       }
     }
-    personajesAElegir += `\n`;
+    personajesAElegir += `<br>`;
     personajeCaja.innerHTML = personajesAElegir;
     personajesHTML.appendChild(personajeCaja);
   });
@@ -405,6 +419,7 @@ function realizarInventario(razaPersonaje, personajeEscogido) {
   setStorage();
 
   //UNA VEZ DECLARADO CAMINOS, TENGO QUE VOLVER A REALIZAR LAS FUNCIONES QUE TENGO EN EL SCRIPT ORIGINAL
+  console.log(terminacion);
   inputChecker(caminos);
 }
 
@@ -423,6 +438,9 @@ function crearBoton(parametro, funcionPasada) {
   window["boton" + parametro].id = parametro.toLowerCase();
   botonera.appendChild(window["boton" + parametro]);
   window["boton" + parametro].addEventListener("click", funcionPasada);
+  if (parametro == "Siguiente") {
+    window["boton" + parametro].focus();
+  }
 }
 
 function mostrarInventario() {
@@ -435,15 +453,15 @@ function mostrarInventario() {
       propiedad[0].toUpperCase()
     )}:</b></br>`;
   }
-  titulosAMostrar += `\n</div>`;
+  titulosAMostrar += `<br></div>`;
 
   let propiedadesAMonstrar = `<div class="right">`;
   for (const propiedad in inventario) {
     propiedadesAMonstrar += `${inventario[propiedad]}</br>`;
   }
-  propiedadesAMonstrar += `\n</div>`;
+  propiedadesAMonstrar += `<br></div>`;
 
-  inventarioAMostrar += titulosAMostrar + propiedadesAMonstrar + `\n</div>`;
+  inventarioAMostrar += titulosAMostrar + propiedadesAMonstrar + `<br></div>`;
   inventarioHTML.innerHTML = inventarioAMostrar;
   let botonInventario = document.createElement("button");
   botonInventario.innerText = "Volver";
@@ -507,10 +525,11 @@ function resetBotonera() {
 
 //ACÁ SE CAMBIA
 function inputChecker(arrayInput) {
-  console.log(caminos[33].descripcion);
+  console.log(terminacion);
   resetBotonera();
-  localStorage.setItem("id", id);
+  localStorage.setItem("id", JSON.stringify(id));
   localStorage.setItem("index", index);
+  localStorage.setItem("idActual", idActual);
   titulo.innerText = arrayInput[index].categoria;
   idACambiar = -1;
   chequeoInput = false;
@@ -518,6 +537,31 @@ function inputChecker(arrayInput) {
   antesDeLogica = false;
   textoAdicional = "";
   descripcionEspecial = "";
+  console.log(id);
+  if (
+    (idActual == 1.3 ||
+      idActual == 1.31 ||
+      idActual == 1.32 ||
+      idActual == 1.33) &&
+    bruja.vida > 0
+  ) {
+    oponente.classList.remove("oculto");
+    oponente.innerHTML = bruja.ruta;
+  } else if (
+    idActual == 2.4 ||
+    idActual == 2.5 ||
+    idActual == 2.6 ||
+    idActual == 2.7 ||
+    idActual == 2.72 ||
+    idActual == 2.73 ||
+    idActual == 2.8
+  ) {
+    oponente.classList.remove("oculto");
+    oponente.innerHTML = dragon.ruta;
+  } else {
+    oponente.classList.add("oculto");
+  }
+
   if (arrayInput[index].especial != undefined) {
     switch (arrayInput[index].especial) {
       case "Voces":
@@ -535,9 +579,9 @@ function inputChecker(arrayInput) {
 
         break;
       case "Combate Bruja":
-        combate(bruja);
+        adicional = combate(bruja);
         logBruja.push(turno);
-        textoAdicional = `\n\nLa bruja tiene ${bruja.vida} puntos de vida.`;
+        textoAdicional = `<br><br>La bruja tiene ${bruja.vida} puntos de vida. ${adicional}`;
         localStorage.setItem("logBruja", JSON.stringify(logBruja));
         localStorage.setItem("bruja", JSON.stringify(bruja));
         localStorage.setItem("turnoContador", turnoContador);
@@ -555,6 +599,7 @@ function inputChecker(arrayInput) {
           turnoContador = 0;
           inventario.combate += 2;
           inventario.vida = healthBase + 5;
+          healthBase = inventario.vida;
           localStorage.removeItem("logBruja");
           localStorage.removeItem("turno");
           localStorage.removeItem("bruja");
@@ -564,8 +609,9 @@ function inputChecker(arrayInput) {
       case "Log Bruja":
         if (turno != "") {
           antesDeLogica = true;
-          descripcionEspecial = arrayInput[index].descripcion + `\n` + turno;
+          descripcionEspecial = arrayInput[index].descripcion + `<br>` + turno;
           idACambiar = arrayInput[index].id;
+          turno = "";
         }
         break;
       case "Vendedor":
@@ -578,7 +624,7 @@ function inputChecker(arrayInput) {
         break;
       case "Soga":
         idACambiar = 3.2;
-        descripcionEspecial = `"Buenos días, ${inventario.nombre}, recuerde que ya no tengo nada para ofrecerle. Solo quería entablar una conversación con usted."`;
+        descripcionEspecial = `"Buenos días, ${inventario.nombre}, recuerde que ya no tengo nada para ofrecerle. Solo quería entablar una conversación con usted. ¿Qué va a hacer usted hoy en este maravilloso día?"`;
         eliminar = true;
         modificarNextId(arrayInput, idACambiar, [3.1]);
         inventario.herramientas = "Soga";
@@ -586,17 +632,22 @@ function inputChecker(arrayInput) {
         break;
       case "Espada":
         espada++;
+        localStorage.setItem("espada", espada);
         console.log(espada);
         if (espada == 2) {
           idACambiar = 3.5;
           respirar = 0;
           localStorage.setItem("respirar", respirar);
+          localStorage.removeItem("espada");
           modificarNextId(arrayInput, idACambiar, [3.1, 3.7]);
         }
         break;
       case "Respiración":
         respirar = localStorage.getItem("respirar");
         texto.classList.add("center");
+        for (let i = 0; i < respirar; i++) {
+          textoAdicional += `<br><br>...`;
+        }
         respirar++;
         localStorage.setItem("respirar", respirar);
         if (respirar == 3) {
@@ -609,7 +660,7 @@ function inputChecker(arrayInput) {
         registroLogro("Espada");
         inventario.armas = "Espada";
         idACambiar = 3.6;
-        descripcionEspecial = `Ya no hay nada que ver aquí, puedes regresar.`;
+        descripcionEspecial = `El agua ya no esconde ningún secreto, aunque se encuentra extremadamente plácida. Te quedas observándola unos minutos, pero sabes que debes regresar.`;
         eliminar = true;
         modificarNextId(arrayInput, idACambiar, [3.1]);
         modificarNextId(arrayInput, 3.5, [3.1, 3.6]);
@@ -624,9 +675,9 @@ function inputChecker(arrayInput) {
         }
         break;
       case "Combate Dragón":
-        combate(dragon);
+        adicional = combate(dragon);
         logDragon.push(turno);
-        textoAdicional = `\n\nEl dragón tiene ${dragon.vida} puntos de vida.`;
+        textoAdicional = `<br><br>El dragón tiene ${dragon.vida} puntos de vida. ${adicional}`;
         localStorage.setItem("logDragon", JSON.stringify(logDragon));
         localStorage.setItem("dragon", JSON.stringify(dragon));
         localStorage.setItem("turnoContador", turnoContador);
@@ -635,15 +686,15 @@ function inputChecker(arrayInput) {
         } else if (victoria) {
           arrayInput[index].nextid[0] = arrayInput[index].nextid[2];
           registroLogro("Dragón");
-          localStorage.remove("logDragon");
-          localStorage.remove("dragon");
-          localStorage.remove("turnoContador");
+          localStorage.removeItem("logDragon");
+          localStorage.removeItem("dragon");
+          localStorage.removeItem("turnoContador");
         }
         break;
       case "Log Dragón":
         if (turno != "") {
           antesDeLogica = true;
-          descripcionEspecial = arrayInput[index].descripcion + `\n` + turno;
+          descripcionEspecial = arrayInput[index].descripcion + `<br>` + turno;
           idACambiar = arrayInput[index].id;
         }
         break;
@@ -651,17 +702,18 @@ function inputChecker(arrayInput) {
         turnoHuida++;
         localStorage.setItem("turnoHuida", turnoHuida);
         inventario.vida =
-          inventario.vida - Math.ceil((Math.random() * dragon.combate) / 2);
+          inventario.vida -
+          Math.floor((Math.random() * 20 + dragon.combate) / 5);
 
         if (inventario.vida <= 0 && turnoHuida <= 5) {
           arrayInput[index].nextid[0] = arrayInput[index].nextid[1];
-          descripcionEspecial = `¡El dragón te ha derrotado! Te has quedado sin vida.\n\nFIN DEL JUEGO.`;
+          descripcionEspecial = `¡El dragón te ha derrotado! Te has quedado sin vida.<br><br>FIN DEL JUEGO.`;
           antesDeLogica = true;
           idACambiar = 2.8;
         } else if (inventario.vida > 0 && turnoHuida <= 5) {
           descripcionEspecial =
             arrayInput[index].descripcion +
-            `\n Turno ${turnoHuida}: Tienes ${inventario.vida} puntos de vida.`;
+            `<br> Turno ${turnoHuida}: Tienes ${inventario.vida} puntos de vida.`;
           antesDeLogica = true;
           idACambiar = 2.8;
         }
@@ -686,7 +738,7 @@ function inputChecker(arrayInput) {
   }
 
   if (arrayInput[index].input) {
-    texto.innerText = arrayInput[index].descripcion;
+    texto.innerHTML = arrayInput[index].descripcion;
     for (let i = 0; i < arrayInput[index].cantidadOpciones; i++) {
       crearBoton(arrayInput[index].opciones[i], () => {
         if (!antesDeLogica) {
@@ -698,7 +750,7 @@ function inputChecker(arrayInput) {
       });
     }
   } else {
-    texto.innerText = arrayInput[index].descripcion + textoAdicional;
+    texto.innerHTML = arrayInput[index].descripcion + textoAdicional;
     crearBoton("Siguiente", () => {
       if (!salir) {
         if (!antesDeLogica) {
@@ -716,32 +768,70 @@ function inputChecker(arrayInput) {
         let tiempoTotal = final - comienzo;
         tiempoTotal = Math.round(tiempoTotal / 1000);
         let unidad = `segundos`;
+        console.log(tiempoTotal);
         if (tiempoTotal > 120) {
           tiempoTotal = Math.round(tiempoTotal / 60);
           unidad = `minutos`;
         }
-        texto.innerText = `${inventario.nombre} del reino ${
+        texto.innerHTML = `${inventario.nombre} del reino ${
           inventario.raza
-        }, aquí tus estadísticas de juego.\n\nHas conseguido un puntaje total de ${puntaje}/100.\n\nLogros obtenidos durante la aventura:\n${logros.join(
+        }, aquí tus estadísticas de juego.<br><br>Has conseguido un puntaje total de ${puntaje}/100.<br><br>Logros obtenidos durante la aventura:<br>${logros.join(
           " "
-        )}\n\nObtuviste un total de ${logrosTotales} de ${
+        )}<br><br>Obtuviste un total de ${logrosTotales} de ${
           logros.length
-        } logros.\n\nEl tiempo total de aventura fue de ${tiempoTotal} ${unidad}.`;
+        } logros.<br><br>El tiempo total de aventura fue de ${tiempoTotal} ${unidad}.`;
+
+        localStorage.clear();
         if (puntaje == 100) {
           crearBoton("Siguiente", () => {
-            texto.innerText = `¡JUEGO PERFECTO EN PUNTAJE! Felicidades, ${inventario.nombre} del reino ${inventario.raza}, tu nombre será recordado, lamentablemente, por poco tiempo, porque nos quedamos sin tinta para ponerlo en los registros del pueblo.\n\nSin embargo, siempre puedes sacar un ScreenShot de tu resultado y enviarmela.\n\n¡Gracias por jugar!`;
+            texto.innerHTML = `¡JUEGO PERFECTO EN PUNTAJE! Felicidades, ${inventario.nombre} del reino ${inventario.raza}, tu nombre será recordado, y haz sido nombrad${terminacion} el ${inventario.raza} más valiente de estos tiempos.`;
             resetBotonera();
+            crearBoton("Siguiente", finDelJuego);
           });
+        } else {
+          crearBoton("Siguiente", finDelJuego);
         }
-        localStorage.clear();
       }
     });
   }
 }
 
+function finDelJuego() {
+  resetBotonera();
+  texto.innerHTML = `¡Muchas gracias por jugar! Dado que aun no puedo guardar tus datos, tienes la opción de enviarme tus logros y estadísticas por correo para que figure próximamente en la base de datos del juego. Si lo deseas, puedes presionar el botón 'Correo' para hacerlo. Te recomiendo simplemente mandarlo como se genera. Obviamente puedes dejar algún comentario adicional si lo deseas.<br><br>Puedes reiniciar el juego o ver las distintas estadísticas de previos jugadores.`;
+  crearBoton("Enviar Correo", () => {
+    let mail = "sofiacermi@hotmail.com";
+    let asunto = `Estadísticas de juego de ${inventario.nombre}`;
+    let cuerpo = `¡Hola! Estas son mis estadísticas para que se incluyan en el juego.
+    
+    {
+      nombre: "${inventario.nombre}",
+      raza: "${inventario.raza}",
+      clase: "${inventario.clase}",
+      vida: ${healthBase},
+      iniciativa: ${inventario.iniciativa},
+      combate: ${inventario.combate},
+      defensa: ${inventario.defensa},
+      puntaje: ${puntaje},
+      logros: ${logrosTotales},
+      tiempo: ${Math.round((final - comienzo) / 1000)},
+    }`;
+
+    let mailtoLink = `mailto:${mail}?subject=${encodeURIComponent(
+      asunto
+    )}&body=${encodeURIComponent(cuerpo)}`;
+    window.location.href = mailtoLink;
+  });
+  crearBoton("Reiniciar", inicio);
+  crearBoton("Estadísticas", () => {});
+
+  //FALTAN ESTADÍSTICAS
+}
+
 function nextIndex(arrayInput, numeroID) {
   id = arrayInput[index].nextid;
   index = arrayInput.findIndex((camino) => {
+    idActual = camino.id;
     return camino.id === id[numeroID];
   });
 }
@@ -767,8 +857,9 @@ function modificarNextId(arrayInput, nextIDacambiar, nextID) {
 }
 
 function combate(oponente) {
-  iniciativaPropia = Math.ceil(Math.random() * inventario.iniciativa);
-  iniciativaOponente = Math.ceil(Math.random() * oponente.iniciativa);
+  textoExtra = "";
+  iniciativaPropia = Math.ceil(Math.random() * 10) + inventario.iniciativa;
+  iniciativaOponente = Math.ceil(Math.random() * 10) + oponente.iniciativa;
   if (iniciativaPropia > iniciativaOponente) {
     primero = inventario;
     ini = true;
@@ -778,63 +869,61 @@ function combate(oponente) {
     ini = false;
     segundo = inventario;
   }
-  danoASegundo =
-    Math.ceil(Math.random() * primero.combate) -
-    Math.ceil(Math.random() * segundo.combate);
-  if (danoASegundo <= 1) {
-    danoASegundo = 1;
-  }
-  segundo.vida -= danoASegundo;
-  if (segundo.vida <= 0) {
-    if (ini) {
-      victoria = true;
-    } else {
-      muerte = true;
-    }
+  ataque1 = Math.ceil(Math.random() * 20) + primero.combate;
+  defensa1 = Math.ceil(Math.random() * 20) + segundo.defensa;
+
+  if (defensa1 == 20 + segundo.defensa) {
+    danoASegundo = 0;
+    textoExtra += `<br><br>¡Defensa perfecta de ${segundo.nombre}!`;
+  } else if (ataque1 == 20 + primero.combate) {
+    danoASegundo = Math.floor(ataque1 / 4);
+    textoExtra += `<br><br>¡Golpe crítico de ${primero.nombre}!`;
   } else {
-    danoAPrimero =
-      Math.ceil(Math.random() * segundo.combate) -
-      Math.ceil(Math.random() * primero.combate);
-    if (danoAPrimero <= 1) {
-      danoAPrimero = 1;
+    danoASegundo = Math.floor((ataque1 - defensa1) / 4);
+    danoASegundo < 1 ? (danoASegundo = 1) : danoASegundo;
+  }
+
+  segundo.vida -= danoASegundo;
+
+  if (segundo.vida <= 0) {
+    segundo.vida = 0;
+    ini ? (victoria = true) : (muerte = true);
+  } else {
+    ataque2 = Math.ceil(Math.random() * 20) + segundo.combate;
+    defensa2 = Math.ceil(Math.random() * 20) + primero.defensa;
+
+    if (defensa2 == 20 + primero.defensa) {
+      danoAPrimero = 0;
+      textoExtra += `<br><br>¡Defensa perfecta de ${primero.nombre}!`;
+    } else if (ataque2 == 20 + segundo.combate) {
+      danoAPrimero = Math.floor(ataque2 / 4);
+      textoExtra += `<br><br>¡Golpe crítico de ${segundo.nombre}!`;
+    } else {
+      danoAPrimero = Math.floor((ataque2 - defensa2) / 4);
+      danoAPrimero < 1 ? (danoAPrimero = 1) : danoAPrimero;
     }
+
     primero.vida -= danoAPrimero;
   }
+
   if (primero.vida <= 0) {
-    if (ini) {
-      muerte = true;
-    } else {
-      victoria = true;
-    }
+    primero.vida = 0;
+    ini ? (muerte = true) : (victoria = true);
   }
+
   turnoContador++;
-  if (ini) {
-    turno = `Turno ${turnoContador}:\nIniciativa: ${primero.nombre}. Daño Hecho: ${danoASegundo}. Daño Recibido: ${danoAPrimero}. Vida de ${oponente.nombre}: ${oponente.vida}.`;
-  } else {
-    turno = `Turno ${turnoContador}:\nIniciativa: ${primero.nombre}. Daño Hecho: ${danoAPrimero}. Daño Recibido: ${danoASegundo}. Vida de ${oponente.nombre}: ${oponente.vida}.`;
-  }
+  ini
+    ? (turno = `Turno ${turnoContador} - Iniciativa: ${primero.nombre}. Daño Hecho: ${danoASegundo}. Daño Recibido: ${danoAPrimero}. Vida de ${oponente.nombre}: ${oponente.vida}.`)
+    : (turno = `Turno ${turnoContador} - Iniciativa: ${primero.nombre}. Daño Hecho: ${danoAPrimero}. Daño Recibido: ${danoASegundo}. Vida de ${oponente.nombre}: ${oponente.vida}.`);
+
+  return textoExtra;
 }
-
-//BOTÓN CORREO
-/*const recipient = "example@example.com";
-const subject = "HEYHEYEHY";
-const body = `This is the body of the email. ${nombre}`;
-
-const mailtoLink = `mailto:${recipient}?subject=${encodeURIComponent(
-  subject
-)}&body=${encodeURIComponent(body)}`;
-BOTONMAIL = document.getElementById("botonmail");
-
-BOTONMAIL.addEventListener("click", () => {
-  window.location.href = mailtoLink;
-});
-*/
 
 function declaracionDeCaminos() {
   caminos = [
     {
       id: 0,
-      descripcion: `${inventario.nombre}, del reino ${inventario.raza}, ¡un gusto conocerte! Has llegado en el momento indicado, necesitamos tu ayuda.\n\nDebes saber que en nuestro reino, Javascra, una terrible amenaza acecha en el temible castillo que tenemos delante.\n\nMira, te mostraré. Sígueme.`,
+      descripcion: `${inventario.nombre}, del reino ${inventario.raza}, ¡un gusto conocerte! Has llegado en el momento indicado, necesitamos tu ayuda.<br><br>Debes saber que en nuestro reino, Javascra, una terrible amenaza acecha en el temible castillo que tenemos delante.<br><br>Mira, sígueme, te mostraré.`,
       categoria: "Introducción",
       input: false,
       cantidadOpciones: 0,
@@ -842,7 +931,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 0.1,
-      descripcion: `Espera, antes que lo olvide. En cualquier momento, al escribir la palabra "ficha" se mostrarán tus stats.\n\nEsto es muy importante, así que leeme bien. Si en cualquier momento deseas salir del juego, solo escribe '13'. Recuerda ese número mágico, ya que no lo mencionaré más adelante. Es un número que en el reino de Javascra ha traido mucha mala suerte, y creemos que el dragón está aquí por ese mismo número.\n\nEspero que no tengas que usarlo. ¡Confío en ti!`,
+      descripcion: `Espera, antes que lo olvide. En cualquier momento puedes presionar la imagen de tu personaje para ver tus estadísticas actualizadas. ¡Recuerda que tus puntos de vida son primordiales!<br><br>Por otro lado, si en cualquier momento del juego, de ahora en adelante, necesitas salir, ¡no te preocupes! Aquí en Javascra tenemos muy buena memoria, por lo que no se borrarán tus datos. Simplemente volverás donde quedaste.<br><br>Ahora sí, continuemos.`,
       categoria: "Introducción",
       input: false,
       cantidadOpciones: 0,
@@ -850,7 +939,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 0.2,
-      descripcion: `Presta mucha atención.\n\nVerás, el castillo que ves en el camino de adelante, es custodiado por un enorme dragón que lo ha invadido, y ha sacado a todos con su temible fuego hace algunas lunas llenas atrás. El castillo contaba con un puente que cruza el río, pero el fuego del dragón lo ha deshecho. Si tomas ese camino, no podrás regresar. ¡Pero necesitamos que vayas a por él! No estamos apurados, debo confesarte, pero nos gustaria que nos puedas ayudar.`,
+      descripcion: `Presta mucha atención a lo que te voy a contar. Acércate un poco más.<br><br>Verás, el castillo que ves en el camino de adelante, es custodiado por un enorme dragón que lo ha invadido, y ha sacado a todos con su temible fuego hace algunas lunas llenas atrás. El castillo contaba con un puente que cruza el río, pero el fuego del dragón lo ha deshecho. Si tomas ese camino, no podrás regresar. ¡Pero necesitamos que vayas a por él! No estamos apurados, debo confesarte, pero nos gustaria que nos puedas ayudar.`,
       categoria: "Introducción",
       input: false,
       cantidadOpciones: 0,
@@ -858,7 +947,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 0.3,
-      descripcion: `Por otro lado, en el camino de la izquierda, tienes el bosque encantado. Puedes descubrir algún que otro encanto en él, podrías investigarlo, y siempre puedes regresar aquí... Si no mueres en el intento, claro. En el bosque hay criaturas que pueden atentar contra ti.\n\nPor último, en este camino que tienes a la derecha, irás al muelle, donde se encuentra un pequeño poblado, ahí se han refugiado la mayoría de los sirvientes del castillo. El rey y la reina se encuentran seguros en un lugar que no puedo decirte...`,
+      descripcion: `En el camino de la izquierda, tienes el bosque encantado. Puedes descubrir algún que otro secreto en él, podrías investigarlo, y siempre puedes regresar aquí... Si no mueres en el intento, claro está. En el bosque hay criaturas que pueden atentar contra ti, aunque creo que podrías conseguir algo de ayuda.<br><br>Por último, en este camino que tienes a la derecha, irás al muelle, donde se encuentra un pequeño poblado, ahí se han refugiado la mayoría de los sirvientes del castillo. El rey y la reina se encuentran seguros en un lugar que no puedo decirte... Porque lo desconozco.`,
       categoria: "Introducción",
       input: false,
       cantidadOpciones: 0,
@@ -866,7 +955,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 0.4,
-      descripcion: `En fin, ${inventario.nombre}, ¡necesitamos de tu ayuda!`,
+      descripcion: `En fin, ${inventario.nombre}, ¡necesitamos de tu ayuda! ¿Estás list${terminacion} para la aventura? Todos los caminos te conducirán a algún lugar, si tienes el alma aventurera, podrías conseguir la victoria eterna.`,
       categoria: "Introducción",
       input: false,
       cantidadOpciones: 0,
@@ -874,7 +963,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 0.5,
-      descripcion: `¡Debes escoger tu camino! Ingresa debajo el número donde deseas dirigirte:\n\n1. Bosque.\n2. Castillo (¡Importante! No podrás regresar).\n3. Muelle`,
+      descripcion: `¡Debes escoger tu camino! En los botones de abajo tienes las opciones.<br><br>¡Recuerda! Si escoges ir al castillo, no podrás regresar.`,
       categoria: "Introducción",
       input: true,
       cantidadOpciones: 3,
@@ -883,7 +972,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 1,
-      descripcion: `'El Bosque Encantado: Donde los árboles susurran secretos y la magia cobra vida.'\nLo cierto es que nunca escuché a un árbol susurrar, pero igualmente, deberías tener cuidado.\n\n${inventario.nombre}, encuentras a tu izquierda la continuación del bosque. Una dulce voz te llama la atención. A tu derecha, sin embargo, una lúgubre cabaña te invita a pasar.`,
+      descripcion: `"El Bosque Encantado: Donde los árboles susurran secretos y la magia cobra vida."<br><br>Lo cierto es que nunca escuché a un árbol susurrar, pero igualmente, deberías tener cuidado.<br><br>${inventario.nombre}, encuentras a tu izquierda la continuación del bosque. Una dulce voz te llama la atención. A tu derecha, sin embargo, una lúgubre cabaña te invita a pasar.`,
       categoria: "Bosque",
       input: false,
       cantidadOpciones: 0,
@@ -891,16 +980,16 @@ function declaracionDeCaminos() {
     },
     {
       id: 1.01,
-      descripcion: `Debes escoger tu camino. \n\n0. Regresar al comienzo\n1. Adentrarte más en el bosque.\n2. Entrar a la cabaña..`,
+      descripcion: `¡Debes escoger tu camino! En los botones de abajo tienes las opciones.<br><br>El bosque es un lugar un poco peligroso, y sientes algo de escalofríos a la sombra de los árboles.`,
       categoria: "Bosque",
       input: true,
       cantidadOpciones: 3,
       nextid: [0.5, 1.1, 1.2],
-      opciones: ["Regresar", "Bosque", "Cabaña"],
+      opciones: ["Regresar", "Continuar", "Cabaña"],
     },
     {
       id: 1.1,
-      descripcion: `Sigues la dulce voz, y a medida que te adentras en el bosque, te da un poco de sueño.\n\nTe duermes sin darte cuenta. Algo te picotea en el brazo. Pierdes 1 de vida.\n\nAl despertarte, te encuentras nuevamente frente a los tres caminos.`,
+      descripcion: `Sigues la dulce voz, y a medida que te adentras en el bosque, te da un poco de sueño.<br><br>Te duermes sin darte cuenta. Algo te picotea en el brazo. Pierdes 1 de vida.<br><br>Al despertarte, te encuentras nuevamente frente a los tres caminos. ¿Raro? Sin duda. Quizás no debas volver a perderte en el bosque.`,
       categoria: "Bosque",
       input: false,
       cantidadOpciones: 0,
@@ -909,7 +998,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 1.11,
-      descripcion: `¡Te has quedado sin puntos de vida!\n\nFIN DEL JUEGO.`,
+      descripcion: `¡Te has quedado sin puntos de vida! Los animales del bosque tendrán qué comer esta noche.<br><br><center>FIN DEL JUEGO.</center>`,
       categoria: "Bosque",
       input: false,
       cantidadOpciones: 0,
@@ -917,7 +1006,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 1.2,
-      descripcion: `Entras a la cabaña ya sin pensarlo nuevamente. Sientes un frío importante, te tiembla el cuerpo. Sientes miedo, y sabes que no eres la única persona ahí dentro.`,
+      descripcion: `Entras a la cabaña ya sin pensarlo nuevamente. Sientes un frío importante, te tiembla el cuerpo. Sientes miedo, y tienes el presentimiento de que no te encuentras sol${terminacion}.`,
       categoria: "Bosque",
       input: false,
       cantidadOpciones: 0,
@@ -925,7 +1014,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 1.21,
-      descripcion: `Debes escoger tu camino. \n\n0. Volver hacia atrás.\n1. Bajar al sótano.\n2. Explorar la cocina.`,
+      descripcion: `¡Debes escoger tu camino! En los botones de abajo tienes las opciones.<br><br>Hay un olor extraño en el aire. Ves a la izquierda hay una trampilla abierta que parece tener escaleras que bajan a un sótano. A la derecha, un pasillo parece conducir a una cocina.`,
       categoria: "Bosque",
       input: true,
       cantidadOpciones: 3,
@@ -934,7 +1023,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 1.3,
-      descripcion: `Una horrible figura te observa desde una esquina. Observa que sus manos está haciendo movimientos extraños. ¡Deberás derrotar a la bruja!`,
+      descripcion: `Bajas las escaleras con cuidado, el olor extraño viene de ahí abajo.<br><br>Una figura indescifrable te mira desde la esquina, sus ojos brillan en la oscuridad. Observas que sus manos está haciendo movimientos extraños. ¡Es una bruja! ¡Y está por lanzar un hechizo!`,
       categoria: "Bosque",
       input: false,
       cantidadOpciones: 0,
@@ -942,7 +1031,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 1.31,
-      descripcion: `Debes escoger tu acción. \n\n0. Huir \n1. Pelear\n`,
+      descripcion: `¡Debes escoger tu camino! En los botones de abajo tienes las opciones.<br><br>La bruja te mira determinada a pelear y sacarte de su casa. Siempre está la opción de huir...<br>`,
       categoria: "Bosque",
       input: true,
       cantidadOpciones: 2,
@@ -952,7 +1041,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 1.32,
-      descripcion: `¡Esto se torna personal! Le das batalla a la bruja.`,
+      descripcion: `¡Esto se torna personal! Le das batalla a la bruja.`, //Ramdomizer
       categoria: "Bosque",
       input: false,
       cantidadOpciones: 0,
@@ -961,7 +1050,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 1.33,
-      descripcion: `¡La bruja te ha derrotado! Te has quedado sin vida.\n\nFIN DEL JUEGO.`,
+      descripcion: `¡La bruja te ha derrotado! Te has quedado sin vida. La bruja quizás aproveche para hacer alguna poción con partes de tu cuerpo...<br><br><center>FIN DEL JUEGO.</center>`,
       categoria: "Bosque",
       input: false,
       cantidadOpciones: 0,
@@ -969,7 +1058,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 1.34,
-      descripcion: `¡Has derrotado a la bruja!\n\nSubes de nivel, tienes más combate.`,
+      descripcion: `¡Has derrotado a la bruja!<br><br>Esto te da experiencia, ¡te sientes más fuerte!.`,
       categoria: "Bosque",
       input: false,
       cantidadOpciones: 0,
@@ -977,7 +1066,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 1.4,
-      descripcion: `Exploras la cocina, encuentras, en una alacena, un pequeño cofre.\n\nLo abres... ¡Dentro hay 10 monedas! Las guardas antes que nadie te vea.`,
+      descripcion: `Entras a la cocina sin dudarlo. Está lleno de calderos con sustancias muy extrañas a los cuales no te atreves a acercarte.<br><br>Decides revisar las alacenas. Encuentras, luego de varios minutos, un pequeño cofre detrás de algunos frascos de pociones vacías.<br><br>Lo abres... ¡Dentro hay 10 monedas! Las guardas antes que nadie te vea.<br><br>Tranquil${terminacion}, no voy a juzgarte.`,
       categoria: "Bosque",
       input: false,
       cantidadOpciones: 0,
@@ -986,7 +1075,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 2,
-      descripcion: `Ya estamos en la recta final de la aventura. Recuerda, no hay vuelta atrás. De aquí salimos con la victoria o con la muerte, ¡pero a no desesperar, ${inventario.nombre}! Confio plenamente en ti y en tus habilidades.`,
+      descripcion: `¡Cuanta valentía estás demostrando, ${inventario.nombre}!<br><br>Recuerda, no hay vuelta atrás. A partir de este punto, o la victoria o la muerte están aseguradas, ¡pero a no desesperar! Confio plenamente en ti y en tus habilidades. Después de todo, haz estado explorando, ¿cierto?`,
       categoria: "Castillo",
       input: false,
       cantidadOpciones: 0,
@@ -994,7 +1083,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 2.1,
-      descripcion: `El castillo se encuentra a lo lejos, lo ves que está a unas leguas de distancia. El puente roto está frente a ti ahora, y debes cruzarlo.`,
+      descripcion: `El castillo se encuentra a lo lejos, lo ves que está a unas leguas de distancia. El puente roto está frente a ti ahora, y debes cruzar el agua para llegar al otro lado.`,
       categoria: "Castillo",
       input: false,
       cantidadOpciones: 0,
@@ -1003,7 +1092,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 2.2,
-      descripcion: `¡Fuiste lo suficientemente astuto como para traer la soga contigo! Cruzas con tu soga sin problema y pasas por las puertas del castillo.`,
+      descripcion: `¡Fuiste lo suficientemente astuto como para traer la soga contigo! Atas la soga, te balanceas y llegas al otro lado sin problemas, demostrando tu destreza y, por sobretodo, tu valentía.<br><br>Llegas a las puertas del castillo, y entras ya sin dudarlo.`,
       categoria: "Castillo",
       input: false,
       cantidadOpciones: 0,
@@ -1011,7 +1100,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 2.3,
-      descripcion: `Cruzar por el río provocó que te cansaras y que te hicieras algo de daño en el proceso. Aún así, llegas a las puertas del castillo y entras.`,
+      descripcion: `Bajas despacio hasta tocar el agua. Cruzar por el río provoca que te canses, y sientes que te lastimas en el proceso. Luego, vuelves a escalar hasta llegar a los pies del castillo.<br><br>Llegas a la puerta, y titubeas al entrar, aunque finalmente lo haces.`,
       categoria: "Castillo",
       input: false,
       cantidadOpciones: 0,
@@ -1019,7 +1108,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 2.4,
-      descripcion: `Un gran salón se impone frente a ti. El enorme dragón se encuentra ahí, te ve llegar y abre la boca para escupir fuego. ¡Debes hacer algo al respecto!`,
+      descripcion: `Un gran salón se impone frente a ti. El enorme dragón se encuentra ahí, ansioso. Pareciera como si te hubiese estado esperando.<br><br>El ruido de la puerta le llama la atención, te ve llegar y abre la boca para escupir fuego. ¡Esto se está por poner muy feo!`,
       categoria: "Castillo",
       input: false,
       cantidadOpciones: 0,
@@ -1027,7 +1116,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 2.5,
-      descripcion: `Debes escoger tu camino.\n\n1. Escapar del dragón.\n2. Enfrentar al dragón.\n`,
+      descripcion: `¡Debes escoger tu camino! En los botones de abajo tienes las opciones.<br><br>El dragón tiene un tamaño imponente, sus escamas de color rojo brillan con la luz del sol que se cuela por el vitral. ¿Estás list${terminacion} para esta batalla? Siempre está la opción de huir...`,
       categoria: "Castillo",
       input: true,
       cantidadOpciones: 2,
@@ -1036,15 +1125,15 @@ function declaracionDeCaminos() {
     },
     {
       id: 2.6,
-      descripcion: `El dragón se ve feroz, ¡pero nada como la valentía de ${inventario.nombre} para enfrentarlo! Te preparas para la gran batalla final.`,
+      descripcion: `El dragón se ve feroz, se para frente a ti y su mirada se ve aterradora, ¡pero nada como la valentía de ${inventario.nombre} para enfrentarlo!<br><br>Te preparas para la gran batalla final. ¡Es tu oportunidad para salvar a Javascra! ¡Mucha suerte!`,
       categoria: "Castillo",
       input: false,
       cantidadOpciones: 0,
-      nextid: [2.7],
+      nextid: [2.72],
     },
     {
       id: 2.7,
-      descripcion: `Debes escoger tu acción. \n\n0. Huir \n1. Pelear\n`,
+      descripcion: `¡Debes escoger tu camino! En los botones de abajo tienes las opciones.<br><br>El dragón no dará tregua, peleará hasta acabar contigo.<br>`,
       categoria: "Castillo",
       input: true,
       cantidadOpciones: 2,
@@ -1054,7 +1143,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 2.72,
-      descripcion: `¡Esto se torna personal! Le das batalla al dragón. ¡El fuego se vuelve insoportable!`,
+      descripcion: `¡Esto se torna personal! Le das batalla al dragón. ¡El fuego se vuelve insoportable!`, //Randomizer.
       categoria: "Castillo",
       input: false,
       cantidadOpciones: 0,
@@ -1063,7 +1152,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 2.73,
-      descripcion: `¡El dragón te ha derrotado! Te has quedado sin vida.\n\nFIN DEL JUEGO.`,
+      descripcion: `¡El dragón te ha derrotado! Te has quedado sin vida. El dragón se entretendrá unas horas comiendo tu cuerpo sin vida.<br><br><center>FIN DEL JUEGO.</center>`,
       categoria: "Castillo",
       input: false,
       cantidadOpciones: 0,
@@ -1071,7 +1160,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 2.74,
-      descripcion: `¡Has derrotado al dragón! La gloria será por siempre tuya. ¡Felicidades! El reino de Javastra te debe tu vida. Vivirás el resto de tus días siendo honrado y tienes un honorifico título. ¡Hurra ${inventario.nombre}!\n\nFIN DEL JUEGO.`,
+      descripcion: `¡Has derrotado al dragón! La gloria será por siempre tuya. ¡Felicidades! El reino de Javascra te debe tu vida. Vivirás el resto de tus días siendo honrad${terminacion}. ¡Hurra ${inventario.nombre} del reino ${inventario.raza}!<br><br>Se realizará una celebración por un ciclo de luna llena en tu nombre. ¡Eres y serás famos${terminacion} por muchas décadas!<br><br><center>FIN DEL JUEGO.</center>`,
       categoria: "Castillo",
       input: false,
       cantidadOpciones: 0,
@@ -1079,7 +1168,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 2.8,
-      descripcion: `¡Huye!\n`,
+      descripcion: `¡Huye!<br>`,
       categoria: "Castillo",
       input: false,
       cantidadOpciones: 0,
@@ -1088,7 +1177,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 2.81,
-      descripcion: `¡Has logrado huir! No pudiste con el dragón. Si bien no has salido con la gloria, has logrado conservar tu vida. Vivirás el resto de tus días escondido.\n\nFIN DEL JUEGO.`,
+      descripcion: `¡Has logrado huir! No pudiste con el dragón. Si bien no has salido con la gloria, has logrado conservar tu vida, no sin tener unas quemaduras importantes en tu cuerpo.<br><br>Vivirás el resto de tus días escondid${terminacion} y exiliad${terminacion}, y tu nombre terminará por olvidarse pronto. Alguien más vendrá después de ti a llevarse la victoria y salvar nuestro reino. No te preocupes, es preferible estar viv${terminacion}, yo no te juzgo.<br><br><center>FIN DEL JUEGO.</center>`,
       categoria: "Castillo",
       input: false,
       cantidadOpciones: 0,
@@ -1096,7 +1185,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 3,
-      descripcion: `'Muelle Javastra: Venga a nuestro hermoso mercado.'\n${inventario.nombre}, te encuentras frente a una gran cantidad de tiendas que te llaman la atención. \n\nEn uno de los puestos de tu izquierda, un hombre te saluda efusivamente para que te acerques. A tu derecha, tienes el muelle en todo su esplendor.`,
+      descripcion: `"Muelle Javascra: Visite a nuestro hermoso mercado."<br><br>${inventario.nombre}, te encuentras frente a una gran cantidad de tiendas que te llaman la atención. Las baratijas se ven bonitas y la comida más que deliciosa. En uno de los puestos de tu izquierda, un hombre te saluda efusivamente para que te acerques.<br><br>A tu derecha, está el puerto, con el agua cristalina reflejando la luz del sol.`,
       categoria: "Muelle",
       input: false,
       cantidadOpciones: 0,
@@ -1105,16 +1194,17 @@ function declaracionDeCaminos() {
 
     {
       id: 3.1,
-      descripcion: `Debes escoger tu camino. \n\n0. Volver hacia atrás.\n1. Ir con el vendendor.\n2. Ir al muelle.`,
+      descripcion: `¡Debes escoger tu camino! En los botones de abajo tienes las opciones.<br><br>El vendedor sigue gritando tu nombre para que te acerques. Aun así, el agua del puerto te llama la atención.`,
       categoria: "Muelle",
       input: true,
       cantidadOpciones: 3,
       nextid: [0.5, 3.2, 3.5],
-      opciones: ["Regresar", "Vendedor", "Muelle"],
+      opciones: ["Regresar", "Vendedor", "Puerto"],
     },
     {
       id: 3.2,
-      descripcion: `'¡Buenos días! Tengo hoy en oferta esta hermosa soga que le permitirá atravesar hasta los más temibles obstáculos. ¡Solo 10 monedas! ¡Es una oferta de tiempo limitado!`,
+      descripcion: `"¡Buenos días! ¿Usted es ${inventario.nombre}? ¡Ya me parecía! He escuchado mucho de usted. ¡Hice bien en llamar su atención!"<br><br>
+      "Tengo hoy en oferta esta hermosa soga que le permitirá atravesar hasta los más temibles obstáculos. ¡Solo 10 monedas! ¡Es una oferta de tiempo limitado! Entiéndame, estamos aquí para generar ganancias, ¿cierto? Después de todo, debo cenar esta noche, y mi familia también."`, //Cambiar intro.
       categoria: "Muelle",
       input: false,
       cantidadOpciones: 0,
@@ -1123,7 +1213,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 3.3,
-      descripcion: `"Me parece que usted no tiene monedas suficientes para esta maravillosa soga. Lamento decirle que no puedo rebajarle el precio."`,
+      descripcion: `"Me parece que usted no tiene monedas suficientes para esta maravillosa soga. Lamento decirle que no puedo rebajarle el precio. Además, 10 monedas no es mucho."`,
       categoria: "Muelle",
       input: false,
       cantidadOpciones: 0,
@@ -1131,7 +1221,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 3.4,
-      descripcion: `'¡Muchas gracias! ${inventario.nombre}, usted ha hecho una fantástica compra! Vuelva pronto.'`,
+      descripcion: `"¡Muchas gracias! ${inventario.nombre}, ¡usted ha hecho una fantástica compra! Vuelva pronto. Recuerde que no hago devoluciones de ningún tipo. Perdone, como le comenté, necesitamos comer esta noche."`,
       categoria: "Muelle",
       input: false,
       cantidadOpciones: 0,
@@ -1140,7 +1230,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 3.5,
-      descripcion: `Un hermoso cuerpo de agua se encuentra frente a ti.\n\nDebes escoger tu acción.\n\n0. Volver hacia atrás.\n1. Seguir mirando el agua.`,
+      descripcion: `¡Debes escoger tu camino! En los botones de abajo tienes las opciones.<br><br>Puedes pasar el tiempo mirando el suave movimiento del agua o regresar donde se encuentran las tiendas.`,
       categoria: "Muelle",
       input: true,
       cantidadOpciones: 2,
@@ -1149,7 +1239,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 3.6,
-      descripcion: `"El agua está muy tranquila, no parece suceder nada.`,
+      descripcion: `"El agua está muy tranquila, no parece haber nada más que peses.`,
       categoria: "Muelle",
       input: false,
       cantidadOpciones: 0,
@@ -1158,7 +1248,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 3.7,
-      descripcion: `¡Hay algo en el agua! Un brillo, un artefacto extraño. Te lanzas al agua sin pensarlo.`,
+      descripcion: `¡Hay algo en el agua! Un brillo, un artefacto extraño. Te lanzas al agua sin pensarlo dos veces.`,
       categoria: "Muelle",
       input: false,
       cantidadOpciones: 0,
@@ -1166,7 +1256,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 3.71,
-      descripcion: `Te zambulles. Aguantas la respiración.`,
+      descripcion: `Te zambulles para alcanzar el artefacto. Aguantas la respiración.`,
       categoria: "Muelle",
       input: false,
       cantidadOpciones: 0,
@@ -1191,7 +1281,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 3.8,
-      descripcion: `¡Has conseguido salir del agua! ¡Y con una espada en la mano! Aumentan tu combate, ahora eres todo un guerrero.`,
+      descripcion: `¡Has conseguido salir del agua! ¡Y con una espada en la mano! Aumentan tu combate, estás list${terminacion} para pelear contra cualquier enemigo que se cruce en tu camino.`,
       categoria: "Muelle",
       input: false,
       cantidadOpciones: 0,
@@ -1209,4 +1299,381 @@ function declaracionDeCaminos() {
       especial: "Fin",
     },
   ];
+}
+function declaracionDeJugadores() {
+  let jugadores = [
+    {
+      nombre: "Lord List",
+      raza: "Humano",
+      clase: "Caballero",
+      vida: 13,
+      iniciativa: 0,
+      combate: 2,
+      defensa: 5,
+      puntaje: 95,
+      logros: 3,
+      tiempo: 8,
+    },
+    {
+      nombre: "Sir William",
+      raza: "Humano",
+      clase: "Rogue",
+      vida: 10,
+      iniciativa: 4,
+      combate: 3,
+      defensa: 3,
+      puntaje: 1,
+      logros: 2,
+      tiempo: 1,
+    },
+    {
+      nombre: "Lord Richard",
+      raza: "Humano",
+      clase: "Cazador",
+      vida: 7,
+      iniciativa: 5,
+      combate: 6,
+      defensa: 2,
+      puntaje: 96,
+      logros: 0,
+      tiempo: 1,
+    },
+    {
+      nombre: "Dame Elizabeth",
+      raza: "Elfo",
+      clase: "Bardo",
+      vida: 8,
+      iniciativa: 5,
+      combate: 2,
+      defensa: 5,
+      puntaje: 4,
+      logros: 2,
+      tiempo: 14,
+    },
+    {
+      nombre: "Sir Edward",
+      raza: "Elfo",
+      clase: "Guerrero",
+      vida: 10,
+      iniciativa: 2,
+      combate: 7,
+      defensa: 1,
+      puntaje: 14,
+      logros: 4,
+      tiempo: 4,
+    },
+    {
+      nombre: "Dame Eleanor",
+      raza: "Elfo",
+      clase: "Profeta",
+      vida: 9,
+      iniciativa: 3,
+      combate: 5,
+      defensa: 3,
+      puntaje: 36,
+      logros: 3,
+      tiempo: 0,
+    },
+    {
+      nombre: "Lady Isabella",
+      raza: "Elfo",
+      clase: "Monje",
+      vida: 12,
+      iniciativa: 2,
+      combate: 2,
+      defensa: 4,
+      puntaje: 97,
+      logros: 2,
+      tiempo: 12,
+    },
+    {
+      nombre: "Dame Margaret",
+      raza: "Elfo",
+      clase: "Asesino",
+      vida: 11,
+      iniciativa: 6,
+      combate: 3,
+      defensa: 0,
+      puntaje: 93,
+      logros: 2,
+      tiempo: 13,
+    },
+    {
+      nombre: "Sir Henry",
+      raza: "Orco",
+      clase: "Arquero",
+      vida: 12,
+      iniciativa: 0,
+      combate: 5,
+      defensa: 3,
+      puntaje: 83,
+      logros: 1,
+      tiempo: 8,
+    },
+    {
+      nombre: "Sir Thomas",
+      raza: "Elfo",
+      clase: "Herrero",
+      vida: 9,
+      iniciativa: 4,
+      combate: 6,
+      defensa: 1,
+      puntaje: 32,
+      logros: 0,
+      tiempo: 3,
+    },
+    {
+      nombre: "Sir Richard",
+      raza: "Orco",
+      clase: "Asaltador",
+      vida: 7,
+      iniciativa: 6,
+      combate: 4,
+      defensa: 3,
+      puntaje: 53,
+      logros: 4,
+      tiempo: 14,
+    },
+    {
+      nombre: "Lady Victoria",
+      raza: "Orco",
+      clase: "Destructor",
+      vida: 9,
+      iniciativa: 2,
+      combate: 7,
+      defensa: 2,
+      puntaje: 96,
+      logros: 3,
+      tiempo: 1,
+    },
+    {
+      nombre: "Sir John",
+      raza: "Elfo",
+      clase: "Artesano",
+      vida: 11,
+      iniciativa: 1,
+      combate: 2,
+      defensa: 6,
+      puntaje: 3,
+      logros: 0,
+      tiempo: 1,
+    },
+    {
+      nombre: "Sir Robert",
+      raza: "Orco",
+      clase: "Carroñero",
+      vida: 8,
+      iniciativa: 4,
+      combate: 3,
+      defensa: 5,
+      puntaje: 65,
+      logros: 4,
+      tiempo: 3,
+    },
+    {
+      nombre: "Lady Emily",
+      raza: "Mago",
+      clase: "Profeta",
+      vida: 13,
+      iniciativa: 3,
+      combate: 4,
+      defensa: 0,
+      puntaje: 7,
+      logros: 0,
+      tiempo: 7,
+    },
+    {
+      nombre: "Lord Charles",
+      raza: "Mago",
+      clase: "Nigromante",
+      vida: 10,
+      iniciativa: 1,
+      combate: 5,
+      defensa: 4,
+      puntaje: 17,
+      logros: 5,
+      tiempo: 4,
+    },
+    {
+      nombre: "Dame Catherine",
+      raza: "Humano",
+      clase: "Caballero",
+      vida: 13,
+      iniciativa: 0,
+      combate: 2,
+      defensa: 5,
+      puntaje: -4,
+      logros: 2,
+      tiempo: 2,
+    },
+    {
+      nombre: "Sir James",
+      raza: "Humano",
+      clase: "Rogue",
+      vida: 10,
+      iniciativa: 4,
+      combate: 3,
+      defensa: 3,
+      puntaje: 84,
+      logros: 2,
+      tiempo: 15,
+    },
+    {
+      nombre: "Sir Richard",
+      raza: "Humano",
+      clase: "Cazador",
+      vida: 7,
+      iniciativa: 5,
+      combate: 6,
+      defensa: 2,
+      puntaje: 39,
+      logros: 4,
+      tiempo: 7,
+    },
+    {
+      nombre: "Lord William",
+      raza: "Elfo",
+      clase: "Bardo",
+      vida: 8,
+      iniciativa: 5,
+      combate: 2,
+      defensa: 5,
+      puntaje: 55,
+      logros: 3,
+      tiempo: 9,
+    },
+    {
+      nombre: "Sir Thomas",
+      raza: "Elfo",
+      clase: "Guerrero",
+      vida: 10,
+      iniciativa: 2,
+      combate: 7,
+      defensa: 1,
+      puntaje: 27,
+      logros: 5,
+      tiempo: 1,
+    },
+    {
+      nombre: "Lord Edward",
+      raza: "Elfo",
+      clase: "Profeta",
+      vida: 9,
+      iniciativa: 3,
+      combate: 5,
+      defensa: 3,
+      puntaje: 4,
+      logros: 1,
+      tiempo: 15,
+    },
+    {
+      nombre: "Dame Isabella",
+      raza: "Elfo",
+      clase: "Monje",
+      vida: 12,
+      iniciativa: 2,
+      combate: 2,
+      defensa: 4,
+      puntaje: 55,
+      logros: 5,
+      tiempo: 15,
+    },
+    {
+      nombre: "Dame Margaret",
+      raza: "Elfo",
+      clase: "Asesino",
+      vida: 11,
+      iniciativa: 6,
+      combate: 3,
+      defensa: 0,
+      puntaje: 31,
+      logros: 4,
+      tiempo: 3,
+    },
+    {
+      nombre: "Dame Eleanor",
+      raza: "Orco",
+      clase: "Arquero",
+      vida: 12,
+      iniciativa: 0,
+      combate: 5,
+      defensa: 3,
+      puntaje: 83,
+      logros: 1,
+      tiempo: 12,
+    },
+    {
+      nombre: "Sir William",
+      raza: "Orco",
+      clase: "Herrero",
+      vida: 9,
+      iniciativa: 4,
+      combate: 6,
+      defensa: 1,
+      puntaje: 39,
+      logros: 6,
+      tiempo: 4,
+    },
+    {
+      nombre: "Lady Victoria",
+      raza: "Orco",
+      clase: "Asaltador",
+      vida: 7,
+      iniciativa: 6,
+      combate: 4,
+      defensa: 3,
+      puntaje: 80,
+      logros: 3,
+      tiempo: 6,
+    },
+    {
+      nombre: "Sir John",
+      raza: "Orco",
+      clase: "Destructor",
+      vida: 9,
+      iniciativa: 2,
+      combate: 7,
+      defensa: 2,
+      puntaje: 30,
+      logros: 6,
+      tiempo: 13,
+    },
+    {
+      nombre: "Lady Mary",
+      raza: "Enano",
+      clase: "Artesano",
+      vida: 11,
+      iniciativa: 1,
+      combate: 2,
+      defensa: 6,
+      puntaje: 19,
+      logros: 1,
+      tiempo: 2,
+    },
+    {
+      nombre: "Dame Catherine",
+      raza: "Orco",
+      clase: "Carroñero",
+      vida: 8,
+      iniciativa: 4,
+      combate: 3,
+      defensa: 5,
+      puntaje: 39,
+      logros: 0,
+      tiempo: 10,
+    },
+    {
+      nombre: "Sir Hellrider",
+      raza: "Orco",
+      clase: "Destructor",
+      vida: 9,
+      iniciativa: 2,
+      combate: 14,
+      defensa: 2,
+      puntaje: 95,
+      logros: 4,
+      tiempo: 478,
+    },
+  ];
+  console.log(jugadores);
 }
