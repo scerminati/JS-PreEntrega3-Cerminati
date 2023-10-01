@@ -2,15 +2,19 @@
 let nombre,
   sexo,
   terminacion,
-  espada,
+  arma,
+  armaAEncontrar,
+  armaTexto,
   comienzo,
   final,
   salir,
   muerte,
   victoria,
   turnoContador,
+  muestraDetalle,
   turno,
   turnoHuida,
+  oponenteIds,
   logBruja,
   logDragon,
   bandera,
@@ -164,8 +168,33 @@ let cordialidad = [
       combate: 5,
       defensa: 4,
     },
+  ],
+  mensajeBruja = [
+    `Tienes miedo de la bruja, aunque no dudas de tus capacidades.`,
+    `Das pelea, tu valentía no flanquea.`,
+    `La bruja quiere que te vayas de su cabaña.`,
+    `La bruja te lanza un hechizo, no te hace sentir muy bien.`,
+    `Pegas con todas tus fuerzas, aunque no estás seguro que eso funcione.`,
+    `Crees que capaz no fue la mejor decisión de todas entrar a la cabaña, ¿merece la pena terminar esta batalla?`,
+    `Dudas de tus capacidades por un segundo, aunque correr no es opción, ¿no?`,
+    `¡No te rindas todavía! ¡Aun eres capaz de derrotarla!`,
+    `¿Venir a Javascra fue un error? ¿Acaso todas las brujas del reino son así de malvadas?`,
+    `Logras esquivar un frasco, un olor pútrido sale de la poción cuando cae al suelo. ¡Era veneno!`,
+    `¡Esto se torna personal! Le das batalla a la bruja.`,
+  ],
+  mensajeDragon = [
+    `El fuego del dragón es inoportable, te quema parte de tus ropas.`,
+    `Das pelea, tu valentía no flanquea.`,
+    `El dragón te mira con hambre, parece que te considera tu cena.`,
+    `El dragón tira un zarpazo, rasguña tu pierna. Estás sangrando.`,
+    `Atacas con todo tu poder, pero no sabes si eso será suficiente para derrotar a la bestia.`,
+    `¿Puedes ser la salvación del reino? ¿Vale la pena pasar por esto?`,
+    `Dudas de tus capacidades por un segundo. Siempre se puede huir.`,
+    `¡No te rindas todavía! ¡Aun eres capaz de derrotarlo!`,
+    `¿Un dragón? Podría haber sido una lagartija a derrotar, ¿no? Bueno, eso no convertiría en heroe a cualquiera.`,
+    `Logras esquivar el aliento del dragón, cargado de calor.`,
+    `¡Esto se torna personal! Le das batalla al dragón. ¡El fuego se vuelve insoportable!`,
   ];
-
 //Se añaden las imágenes para cada personaje.
 personajes.forEach((personaje) => {
   let razaP = personaje.raza;
@@ -178,6 +207,24 @@ personajes.forEach((personaje) => {
       ruta: `<img src="./images/${razaP}${sexoP[index]}.png" />`,
     };
   }
+  switch (personaje.raza) {
+    case "Humano":
+      personaje.armaTexto = "Una Espada";
+      personaje.armaAEncontrar = "Espada";
+      break;
+    case "Elfo":
+      personaje.armaTexto = "Un arco y flechas";
+      personaje.armaAEncontrar = "Arco y Flechas";
+      break;
+    case "Mago":
+      personaje.armaTexto = "Un báculo";
+      personaje.armaAEncontrar = "Báculo";
+      break;
+    case "Orco":
+      personaje.armaTexto = "Una masa";
+      personaje.armaAEncontrar = "Masa";
+      break;
+  }
 });
 //Levantar todos los elementos de DOM
 let texto = document.getElementById("texto");
@@ -189,7 +236,15 @@ let usuario = document.getElementById("usuario");
 let oponente = document.getElementById("oponente");
 let inventarioHTML = document.getElementById("inventario");
 let pergamino = document.getElementById("pergamino");
+let detalles = document.getElementById("detalles");
+let mostrarDetalles = document.getElementById("mostrarDetalles");
+let scrollDiv = document.getElementById("scroll");
+let sendEmail = document.getElementById("sendEmail");
 
+console.log(inventarioHTML);
+//Detalles adicionales de combate, creación de botones y footer con opción a enviar correo.
+
+creacionAdicionales();
 inicio();
 
 // Inicialización de variables globales disponibles para reset.
@@ -197,11 +252,15 @@ function inicio() {
   resetBotonera();
   usuario.classList.add("oculto");
   oponente.classList.add("oculto");
+  detalles.classList.add("oculto");
   personajesHTML.classList.add("oculto");
   bandera = 0;
   nombre = "";
   terminacion = localStorage.getItem("terminacion") || "";
-  espada = Number(localStorage.getItem("espada")) || 0;
+  arma = Number(localStorage.getItem("arma")) || 0;
+  armaAEncontrar = localStorage.getItem("armaAEncontrar") || "";
+  armaTexto = localStorage.getItem("armaTexto") || "";
+  muestraDetalle = false;
   salir = false;
   muerte = false;
   victoria = false;
@@ -226,6 +285,19 @@ function inicio() {
     defensa: 4,
     ruta: `<img src="./images/dragon.png" />`,
   };
+  oponenteIds = [
+    { id: 1.3, oponente: bruja },
+    { id: 1.31, oponente: bruja },
+    { id: 1.32, oponente: bruja },
+    { id: 1.33, oponente: bruja },
+    { id: 2.4, oponente: dragon },
+    { id: 2.5, oponente: dragon },
+    { id: 2.6, oponente: dragon },
+    { id: 2.7, oponente: dragon },
+    { id: 2.72, oponente: dragon },
+    { id: 2.73, oponente: dragon },
+    { id: 2.8, oponente: dragon },
+  ];
   logrosTotales = Number(localStorage.getItem("logrosTotales")) || 0;
   puntaje = Number(localStorage.getItem("puntaje")) || 0;
   logros = JSON.parse(localStorage.getItem("logros")) || [
@@ -244,14 +316,13 @@ function inicio() {
     false,
     false,
   ];
-  index = Number(localStorage.getItem("index")) || 0;
+  index = localStorage.getItem("index") || -1;
   id = JSON.parse(localStorage.getItem("id")) || -1;
-  idActual = localStorage.getItem("idActual", idActual) || 0;
+  idActual = localStorage.getItem("idActual") || -1;
   comienzo = Date.parse(localStorage.getItem("comienzo")) || new Date();
-  console.log(comienzo);
 
   //Inicio de selección de personaje
-  if (id == -1) {
+  if (idActual == -1) {
     titulo.innerText = `Selección de Personaje`;
     texto.innerHTML = `¡Una cordial bienvenida!<br><br>Quisiera saber como puedo dirigirme a ti, ¿puedo llamarte Sir? ¿O debo llamarte Lady? Quizás simplemente debería pedirte el nombre, pero aquí en este reino tenemos esto tan cordial... tu dime.<br><br>Selecciona la opción que más te guste.`;
     for (let index = 0; index < cordialidad.length; index++) {
@@ -259,12 +330,11 @@ function inicio() {
     }
   } else {
     caminos = JSON.parse(localStorage.getItem("caminos"));
-    console.log(caminos[33]);
     inventario = JSON.parse(localStorage.getItem("inventario"));
     healthBase = Number(localStorage.getItem("healthBase"));
-    usuario.classList.toggle("oculto");
+    usuario.classList.remove("oculto");
     usuario.innerHTML = localStorage.getItem("usuarioImagen");
-    personajesHTML.classList.toggle("oculto");
+    personajesHTML.classList.add("oculto");
     usuario.addEventListener("click", mostrarInventario);
     inputChecker(caminos);
   }
@@ -281,19 +351,17 @@ function setNombre(id) {
     if (sexo == "f") {
       terminacion = "a";
     }
-    console.log(terminacion);
     localStorage.setItem("terminacion", terminacion);
     nombre += " ";
     texto.innerHTML = `¡Este es un buen comienzo! Bienvenid${terminacion}, ${nombre}.`;
   }
 
   texto.innerHTML += `<br><br>Introduce tu nombre aquí debajo. ¡No te preocupes! No estarás firmando ningún contrato...<br><br>Por ahora.`;
-  input.classList.toggle("oculto");
+  input.classList.remove("oculto");
   resetBotonera();
   crearBoton("Borrar", borrarInput);
   crearBoton("Enviar", enviarInput);
   input.addEventListener("keyup", (e) => {
-    console.log(e.key);
     e.key === "Enter" && enviarInput();
   });
 }
@@ -316,13 +384,13 @@ function enviarInput() {
     texto.innerHTML = `¡No quieras escaparte de mi! Necesito tu nombre, prometo que no es para realizar un hechizo.<br><br>Por favor, introduce tu nombre.`;
   }
 
-  if (bandera == 3) {
+  if (bandera == 3 && input.value == "") {
     nombre += `Anónim${terminacion}`;
     registroLogro("Nombre");
     texto.innerHTML = `Parece que no confias en mi, no estamos empezando bien entonces. Te llamaré de ahora en más ${nombre}. Tu nombre no es tan conocido en el reino, y a medida que se esparce la voz, generas desconfianza entre la gente.`;
   }
   if (input.value != "" || bandera == 3) {
-    input.classList.toggle("oculto");
+    input.classList.add("oculto");
     resetBotonera();
     input.value = "";
     texto.innerHTML += `<br><br>Por último, deberás escoger una raza. Dime, ¿con cuál de las siguientes razas crees que te identificas más?`;
@@ -349,13 +417,23 @@ function seleccionarRaza(razaSeleccionada) {
   texto.innerHTML = `Haz escogido la raza ${razaPersonaje[0].raza}. A continuación las clases más comunes de esta raza. Debes escoger uno para continuar.`;
   //AÑADIR COMENTARIO DE CADA UNA DE LAS HABILIDADES
   let personajesAElegir = "";
-  personajesHTML.classList.toggle("oculto");
+  personajesHTML.classList.remove("oculto");
+  idActual = 0;
+  detalles.classList.remove("oculto");
+  console.log(inventario);
+  detalles.classList.remove("detalleInv");
+  detalles.classList.add("detalleFirst");
   personajesHTML.innerHTML = "";
   razaPersonaje.forEach((personaje) => {
     personajesAElegir = "";
     let personajeCaja = document.createElement("div");
     for (const propiedad in personaje) {
-      if (propiedad != "raza" && propiedad != "imagen") {
+      if (
+        propiedad != "raza" &&
+        propiedad != "imagen" &&
+        propiedad != "armaAEncontrar" &&
+        propiedad != "armaTexto"
+      ) {
         personajesAElegir += `<b>${propiedad.replace(
           propiedad[0],
           propiedad[0].toUpperCase()
@@ -371,21 +449,16 @@ function seleccionarRaza(razaSeleccionada) {
       realizarInventario(razaPersonaje, personaje.clase)
     );
   });
-  console.log(razaPersonaje);
 }
 
 //Luego de Realizar Inventario, se realiza caminos, por lo tanto, si tengo el juego "guardado" en otra instancia, debo evitar esta inicialización.
 function realizarInventario(razaPersonaje, personajeEscogido) {
-  console.log(personajeEscogido);
-  console.log(razaPersonaje);
   let usuarioEscogido = razaPersonaje.find(
     (personaje) => personaje.clase === personajeEscogido
   );
   let imagenPersonaje = usuarioEscogido.imagen.find(
     (imagen) => imagen.sexo === sexo
   );
-  console.log(imagenPersonaje);
-  console.log(usuarioEscogido);
   inventario = {
     nombre,
     raza: usuarioEscogido.raza,
@@ -399,27 +472,33 @@ function realizarInventario(razaPersonaje, personajeEscogido) {
     monedas: 0,
   };
   healthBase = inventario.vida;
+  armaAEncontrar = usuarioEscogido.armaAEncontrar;
+  armaTexto = usuarioEscogido.armaTexto;
 
+  detalles.classList.add("detalleInv");
+  detalles.classList.remove("detalleFirst");
   console.log(inventario);
-  usuario.classList.toggle("oculto");
+  detalles.classList.add("oculto");
+  usuario.classList.remove("oculto");
   usuario.innerHTML = imagenPersonaje.ruta;
   resetBotonera();
-  personajesHTML.classList.toggle("oculto");
+  personajesHTML.classList.add("oculto");
   usuario.addEventListener("click", mostrarInventario);
-  id = 0;
+  id = [0];
+  index = 0;
+  idActual = 0;
   declaracionDeCaminos();
-  console.log(caminos);
 
   //Seteo de los Local Storages
   localStorage.setItem("comienzo", comienzo);
   localStorage.setItem("healthBase", healthBase);
+  localStorage.setItem("armaAEncontrar", armaAEncontrar);
+  localStorage.setItem("armaTexto", armaTexto);
   localStorage.setItem("usuarioImagen", imagenPersonaje.ruta);
   localStorage.setItem("caminos", JSON.stringify(caminos));
   //Seteo de variables que se inicializan de determinada forma, y que en el resto del código se van a ir cambiando.
   setStorage();
 
-  //UNA VEZ DECLARADO CAMINOS, TENGO QUE VOLVER A REALIZAR LAS FUNCIONES QUE TENGO EN EL SCRIPT ORIGINAL
-  console.log(terminacion);
   inputChecker(caminos);
 }
 
@@ -444,33 +523,36 @@ function crearBoton(parametro, funcionPasada) {
 }
 
 function mostrarInventario() {
-  ocultarInventario();
-  let inventarioAMostrar = `<h3>Inventario</h3><br><div class="flexInv">`;
-  let titulosAMostrar = `<div >`;
-  for (const propiedad in inventario) {
-    titulosAMostrar += `<b>${propiedad.replace(
-      propiedad[0],
-      propiedad[0].toUpperCase()
-    )}:</b></br>`;
-  }
-  titulosAMostrar += `<br></div>`;
+  if (!muestraDetalle) {
+    ocultarInventario();
+    let inventarioAMostrar = `<h3>Inventario</h3><br><div class="flexInv">`;
+    let titulosAMostrar = `<div >`;
+    for (const propiedad in inventario) {
+      titulosAMostrar += `<b>${propiedad.replace(
+        propiedad[0],
+        propiedad[0].toUpperCase()
+      )}:</b></br>`;
+    }
+    titulosAMostrar += `<br></div>`;
 
-  let propiedadesAMonstrar = `<div class="right">`;
-  for (const propiedad in inventario) {
-    propiedadesAMonstrar += `${inventario[propiedad]}</br>`;
-  }
-  propiedadesAMonstrar += `<br></div>`;
+    let propiedadesAMonstrar = `<div class="right">`;
+    for (const propiedad in inventario) {
+      propiedadesAMonstrar += `${inventario[propiedad]}</br>`;
+    }
+    propiedadesAMonstrar += `<br></div>`;
 
-  inventarioAMostrar += titulosAMostrar + propiedadesAMonstrar + `<br></div>`;
-  inventarioHTML.innerHTML = inventarioAMostrar;
-  let botonInventario = document.createElement("button");
-  botonInventario.innerText = "Volver";
-  botonInventario.addEventListener("click", ocultarInventario);
-  inventarioHTML.appendChild(botonInventario);
+    inventarioAMostrar += titulosAMostrar + propiedadesAMonstrar + `<br></div>`;
+    inventarioHTML.innerHTML = inventarioAMostrar;
+    let botonInventario = document.createElement("button");
+    botonInventario.innerText = "Volver";
+    botonInventario.addEventListener("click", ocultarInventario);
+    inventarioHTML.appendChild(botonInventario);
+  }
 }
 
 function ocultarInventario() {
   inventarioHTML.classList.toggle("oculto");
+  detalles.classList.toggle("oculto");
   pergamino.classList.toggle("blurPergamino");
   var nodes = botonera.getElementsByTagName("button");
   for (var i = 0; i < nodes.length; i++) {
@@ -495,9 +577,9 @@ function registroLogro(id) {
       textoLogro = `Has derrotado a la bruja de la cabaña.`;
       puntajeLogro = 20;
       break;
-    case "Espada":
+    case "Arma":
       indice = 3;
-      textoLogro = `Encontraste la espada secreta en el fondo del lago.`;
+      textoLogro = `Encontraste un arma secreta en el fondo del lago.`;
       puntajeLogro = 20;
       break;
     case "Puente":
@@ -523,13 +605,13 @@ function resetBotonera() {
   botonera.innerHTML = "";
 }
 
-//ACÁ SE CAMBIA
 function inputChecker(arrayInput) {
-  console.log(terminacion);
   resetBotonera();
+  setStorage();
   localStorage.setItem("id", JSON.stringify(id));
   localStorage.setItem("index", index);
   localStorage.setItem("idActual", idActual);
+  console.log(index);
   titulo.innerText = arrayInput[index].categoria;
   idACambiar = -1;
   chequeoInput = false;
@@ -537,29 +619,16 @@ function inputChecker(arrayInput) {
   antesDeLogica = false;
   textoAdicional = "";
   descripcionEspecial = "";
-  console.log(id);
-  if (
-    (idActual == 1.3 ||
-      idActual == 1.31 ||
-      idActual == 1.32 ||
-      idActual == 1.33) &&
-    bruja.vida > 0
-  ) {
-    oponente.classList.remove("oculto");
-    oponente.innerHTML = bruja.ruta;
-  } else if (
-    idActual == 2.4 ||
-    idActual == 2.5 ||
-    idActual == 2.6 ||
-    idActual == 2.7 ||
-    idActual == 2.72 ||
-    idActual == 2.73 ||
-    idActual == 2.8
-  ) {
-    oponente.classList.remove("oculto");
-    oponente.innerHTML = dragon.ruta;
-  } else {
-    oponente.classList.add("oculto");
+
+  oponente.classList.add("oculto");
+  for (const propiedad in oponenteIds) {
+    if (oponenteIds[propiedad].id == idActual) {
+      if (oponenteIds[propiedad].oponente.vida > 0) {
+        oponente.classList.remove("oculto");
+        imagenOpo = oponenteIds[propiedad].oponente.ruta;
+        oponente.innerHTML = imagenOpo;
+      }
+    }
   }
 
   if (arrayInput[index].especial != undefined) {
@@ -579,9 +648,12 @@ function inputChecker(arrayInput) {
 
         break;
       case "Combate Bruja":
+        textoAdicional = "";
+        textoAdicional =
+          mensajeBruja[Math.floor(Math.random() * mensajeBruja.length)];
         adicional = combate(bruja);
         logBruja.push(turno);
-        textoAdicional = `<br><br>La bruja tiene ${bruja.vida} puntos de vida. ${adicional}`;
+        textoAdicional += `<br><br>La bruja tiene ${bruja.vida} puntos de vida. ${adicional}`;
         localStorage.setItem("logBruja", JSON.stringify(logBruja));
         localStorage.setItem("bruja", JSON.stringify(bruja));
         localStorage.setItem("turnoContador", turnoContador);
@@ -619,7 +691,6 @@ function inputChecker(arrayInput) {
           arrayInput[index].nextid[0] = arrayInput[index].nextid[1];
           puntaje += 10;
           inventario.monedas -= 10;
-          console.log(index);
         }
         break;
       case "Soga":
@@ -628,17 +699,15 @@ function inputChecker(arrayInput) {
         eliminar = true;
         modificarNextId(arrayInput, idACambiar, [3.1]);
         inventario.herramientas = "Soga";
-        console.log(index);
         break;
-      case "Espada":
-        espada++;
-        localStorage.setItem("espada", espada);
-        console.log(espada);
-        if (espada == 2) {
+      case "Arma":
+        arma++;
+        localStorage.setItem("arma", arma);
+        if (arma == 2) {
           idACambiar = 3.5;
           respirar = 0;
           localStorage.setItem("respirar", respirar);
-          localStorage.removeItem("espada");
+          localStorage.removeItem("arma");
           modificarNextId(arrayInput, idACambiar, [3.1, 3.7]);
         }
         break;
@@ -655,10 +724,10 @@ function inputChecker(arrayInput) {
           localStorage.removeItem("respirar");
         }
         break;
-      case "Log Espada":
+      case "Log Arma":
         texto.classList.remove("center");
-        registroLogro("Espada");
-        inventario.armas = "Espada";
+        registroLogro("Arma");
+        inventario.armas = armaAEncontrar;
         idACambiar = 3.6;
         descripcionEspecial = `El agua ya no esconde ningún secreto, aunque se encuentra extremadamente plácida. Te quedas observándola unos minutos, pero sabes que debes regresar.`;
         eliminar = true;
@@ -675,9 +744,12 @@ function inputChecker(arrayInput) {
         }
         break;
       case "Combate Dragón":
+        textoAdicional = "";
+        textoAdicional =
+          mensajeDragon[Math.floor(Math.random() * mensajeDragon.length)];
         adicional = combate(dragon);
         logDragon.push(turno);
-        textoAdicional = `<br><br>El dragón tiene ${dragon.vida} puntos de vida. ${adicional}`;
+        textoAdicional += `<br><br>El dragón tiene ${dragon.vida} puntos de vida. ${adicional}`;
         localStorage.setItem("logDragon", JSON.stringify(logDragon));
         localStorage.setItem("dragon", JSON.stringify(dragon));
         localStorage.setItem("turnoContador", turnoContador);
@@ -707,17 +779,16 @@ function inputChecker(arrayInput) {
 
         if (inventario.vida <= 0 && turnoHuida <= 5) {
           arrayInput[index].nextid[0] = arrayInput[index].nextid[1];
-          descripcionEspecial = `¡El dragón te ha derrotado! Te has quedado sin vida.<br><br>FIN DEL JUEGO.`;
+          descripcionEspecial = `¡El dragón te ha derrotado! Te has quedado sin vida.<br><br><center>FIN DEL JUEGO.</center>`;
           antesDeLogica = true;
           idACambiar = 2.8;
-        } else if (inventario.vida > 0 && turnoHuida <= 5) {
+        } else if (inventario.vida > 0 && turnoHuida < 5) {
           descripcionEspecial =
             arrayInput[index].descripcion +
             `<br> Turno ${turnoHuida}: Tienes ${inventario.vida} puntos de vida.`;
           antesDeLogica = true;
           idACambiar = 2.8;
-        }
-        if (turnoHuida == 5) {
+        } else if (turnoHuida == 5) {
           arrayInput[index].nextid[0] = arrayInput[index].nextid[2];
           puntaje += 10;
         }
@@ -726,14 +797,12 @@ function inputChecker(arrayInput) {
         salir = true;
         chequeoInput = true;
         final = new Date();
-        console.log(final);
         break;
     }
     setStorage();
   }
   if (antesDeLogica) {
     descripcionChecker(arrayInput, eliminar, idACambiar);
-    console.log(caminos[33].descripcion);
     localStorage.setItem("caminos", JSON.stringify(caminos));
   }
 
@@ -768,7 +837,6 @@ function inputChecker(arrayInput) {
         let tiempoTotal = final - comienzo;
         tiempoTotal = Math.round(tiempoTotal / 1000);
         let unidad = `segundos`;
-        console.log(tiempoTotal);
         if (tiempoTotal > 120) {
           tiempoTotal = Math.round(tiempoTotal / 60);
           unidad = `minutos`;
@@ -1041,7 +1109,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 1.32,
-      descripcion: `¡Esto se torna personal! Le das batalla a la bruja.`, //Ramdomizer
+      descripcion: ``,
       categoria: "Bosque",
       input: false,
       cantidadOpciones: 0,
@@ -1143,7 +1211,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 2.72,
-      descripcion: `¡Esto se torna personal! Le das batalla al dragón. ¡El fuego se vuelve insoportable!`, //Randomizer.
+      descripcion: ``,
       categoria: "Castillo",
       input: false,
       cantidadOpciones: 0,
@@ -1168,7 +1236,7 @@ function declaracionDeCaminos() {
     },
     {
       id: 2.8,
-      descripcion: `¡Huye!<br>`,
+      descripcion: `¡Huye! Corres tan rápido como te dan las piernas.<br>`,
       categoria: "Castillo",
       input: false,
       cantidadOpciones: 0,
@@ -1239,12 +1307,12 @@ function declaracionDeCaminos() {
     },
     {
       id: 3.6,
-      descripcion: `"El agua está muy tranquila, no parece haber nada más que peses.`,
+      descripcion: `El agua está muy tranquila, no parece haber nada más que peces.`,
       categoria: "Muelle",
       input: false,
       cantidadOpciones: 0,
       nextid: [3.5],
-      especial: "Espada",
+      especial: "Arma",
     },
     {
       id: 3.7,
@@ -1281,12 +1349,12 @@ function declaracionDeCaminos() {
     },
     {
       id: 3.8,
-      descripcion: `¡Has conseguido salir del agua! ¡Y con una espada en la mano! Aumentan tu combate, estás list${terminacion} para pelear contra cualquier enemigo que se cruce en tu camino.`,
+      descripcion: `¡Has conseguido salir del agua! ¡Y con un arma en la mano! ¡${armaTexto}! Aumentan tu combate, estás list${terminacion} para pelear contra cualquier enemigo que se cruce en tu camino.`,
       categoria: "Muelle",
       input: false,
       cantidadOpciones: 0,
       nextid: [3.1],
-      especial: "Log Espada",
+      especial: "Log Arma",
     },
 
     {
@@ -1300,6 +1368,7 @@ function declaracionDeCaminos() {
     },
   ];
 }
+
 function declaracionDeJugadores() {
   let jugadores = [
     {
@@ -1674,6 +1743,86 @@ function declaracionDeJugadores() {
       logros: 4,
       tiempo: 478,
     },
+    {
+      nombre: "Andy",
+      raza: "Elfo",
+      clase: "Artesano",
+      vida: 16,
+      iniciativa: 1,
+      combate: 4,
+      defensa: 6,
+      puntaje: 55,
+      logros: 3,
+      tiempo: 1209,
+    },
+    {
+      nombre: "Dame Vagabunda",
+      raza: "Mago",
+      clase: "Nigromante",
+      vida: 15,
+      iniciativa: 1,
+      combate: 12,
+      defensa: 4,
+      puntaje: 95,
+      logros: 4,
+      tiempo: 438,
+    },
+    {
+      nombre: "Lord Farquad",
+      raza: "Humano",
+      clase: "Cazador",
+      vida: 12,
+      iniciativa: 5,
+      combate: 13,
+      defensa: 2,
+      puntaje: 100,
+      logros: 5,
+      tiempo: 356,
+    },
   ];
-  console.log(jugadores);
+}
+
+function creacionAdicionales() {
+  detalles.addEventListener("click", () => {
+    mostrarDetalles.classList.toggle("oculto");
+    usuario.classList.toggle("blurPergamino");
+    scrollDiv.scrollTo(0, 0);
+    if (!inventario) {
+      pergamino.classList.toggle("blurPergamino");
+      var nodes = botonera.getElementsByTagName("button");
+      for (var i = 0; i < nodes.length; i++) {
+        nodes[i].disabled = !nodes[i].disabled;
+      }
+    } else {
+      muestraDetalle = true;
+    }
+  });
+  crearBoton("Volver", () => {
+    mostrarDetalles.classList.add("oculto");
+    usuario.classList.remove("blurPergamino");
+    scrollDiv.scrollTo(0, 0);
+
+    if (!inventario) {
+      pergamino.classList.remove("blurPergamino");
+      var nodes = botonera.getElementsByTagName("button");
+      for (var i = 0; i < nodes.length; i++) {
+        nodes[i].disabled = !nodes[i].disabled;
+      }
+    } else {
+      muestraDetalle = false;
+    }
+  });
+  mostrarDetalles.appendChild(botonVolver);
+  sendEmail.addEventListener("click", () => {
+    let mail = "sofiacermi@hotmail.com";
+    let asunto = `Javascra - Comentarios`;
+    let cuerpo = `¡Hola! Aquí mis comentarios del juego.
+  
+  `;
+
+    let mailtoLink = `mailto:${mail}?subject=${encodeURIComponent(
+      asunto
+    )}&body=${encodeURIComponent(cuerpo)}`;
+    window.location.href = mailtoLink;
+  });
 }
