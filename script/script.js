@@ -25,12 +25,38 @@ let nombre,
   inventario,
   healthBase,
   caminos,
+  jugadores,
+  jugadoresFiltrados,
+  coincide,
   index,
   id,
   idActual,
   chequeoInput,
   bruja,
-  dragon;
+  dragon,
+  correoEnviado,
+  statsOLogros,
+  jugadorFinal;
+//Declaración elementos DOM
+let texto,
+  botonera,
+  titulo,
+  input,
+  personajesHTML,
+  usuario,
+  oponente,
+  inventarioHTML,
+  pergamino,
+  detalles,
+  mostrarDetalles,
+  scrollDiv,
+  sendEmail,
+  ordenarDiv,
+  ordenarTitulo,
+  ordenarTexto,
+  columna1,
+  columna2;
+
 //Declaración variables globales fijas
 let cordialidad = [
     { titulo: "Lord", sexo: "m" },
@@ -48,6 +74,7 @@ let cordialidad = [
       combate: 2,
       defensa: 5,
     },
+
     {
       raza: "Humano",
       clase: "Rogue",
@@ -195,6 +222,7 @@ let cordialidad = [
     `Logras esquivar el aliento del dragón, cargado de calor.`,
     `¡Esto se torna personal! Le das batalla al dragón. ¡El fuego se vuelve insoportable!`,
   ];
+
 //Se añaden las imágenes para cada personaje.
 personajes.forEach((personaje) => {
   let razaP = personaje.raza;
@@ -226,26 +254,12 @@ personajes.forEach((personaje) => {
       break;
   }
 });
-//Levantar todos los elementos de DOM
-let texto = document.getElementById("texto");
-let botonera = document.getElementById("botonera");
-let titulo = document.getElementById("titulo");
-let input = document.getElementById("input");
-let personajesHTML = document.getElementById("personajesHTML");
-let usuario = document.getElementById("usuario");
-let oponente = document.getElementById("oponente");
-let inventarioHTML = document.getElementById("inventario");
-let pergamino = document.getElementById("pergamino");
-let detalles = document.getElementById("detalles");
-let mostrarDetalles = document.getElementById("mostrarDetalles");
-let scrollDiv = document.getElementById("scroll");
-let sendEmail = document.getElementById("sendEmail");
 
-console.log(inventarioHTML);
-//Detalles adicionales de combate, creación de botones y footer con opción a enviar correo.
-
+//Detalles adicionales de combate, creación de botones y footer con opción a enviar correo + levantar elementos DOM.
+levantarDOM();
 creacionAdicionales();
-inicio();
+estadistica();
+//inicio();
 
 // Inicialización de variables globales disponibles para reset.
 function inicio() {
@@ -264,6 +278,7 @@ function inicio() {
   salir = false;
   muerte = false;
   victoria = false;
+  StatsOLogros = false;
   turno = "";
   turnoContador = Number(localStorage.getItem("turnoContador")) || 0;
   logBruja = JSON.parse(localStorage.getItem("logBruja")) || [];
@@ -320,6 +335,7 @@ function inicio() {
   id = JSON.parse(localStorage.getItem("id")) || -1;
   idActual = localStorage.getItem("idActual") || -1;
   comienzo = Date.parse(localStorage.getItem("comienzo")) || new Date();
+  correoEnviado = false;
 
   //Inicio de selección de personaje
   if (idActual == -1) {
@@ -358,16 +374,16 @@ function setNombre(id) {
 
   texto.innerHTML += `<br><br>Introduce tu nombre aquí debajo. ¡No te preocupes! No estarás firmando ningún contrato...<br><br>Por ahora.`;
   input.classList.remove("oculto");
+  input.maxLength = 14 - nombre.length;
+  console.log(input.maxLength);
   resetBotonera();
-  crearBoton("Borrar", borrarInput);
+  crearBoton("Borrar", () => {
+    input.value = "";
+  });
   crearBoton("Enviar", enviarInput);
   input.addEventListener("keyup", (e) => {
     e.key === "Enter" && enviarInput();
   });
-}
-
-function borrarInput() {
-  input.value = "";
 }
 
 function enviarInput() {
@@ -393,6 +409,7 @@ function enviarInput() {
     input.classList.add("oculto");
     resetBotonera();
     input.value = "";
+
     texto.innerHTML += `<br><br>Por último, deberás escoger una raza. Dime, ¿con cuál de las siguientes razas crees que te identificas más?`;
     let categoriaRazas = [];
     personajes.forEach((personaje) => {
@@ -866,11 +883,15 @@ function inputChecker(arrayInput) {
 
 function finDelJuego() {
   resetBotonera();
+  usuario.classList.remove("oculto");
+  titulo.innerText = `Fin`;
   texto.innerHTML = `¡Muchas gracias por jugar! Dado que aun no puedo guardar tus datos, tienes la opción de enviarme tus logros y estadísticas por correo para que figure próximamente en la base de datos del juego. Si lo deseas, puedes presionar el botón 'Correo' para hacerlo. Te recomiendo simplemente mandarlo como se genera. Obviamente puedes dejar algún comentario adicional si lo deseas.<br><br>Puedes reiniciar el juego o ver las distintas estadísticas de previos jugadores.`;
   crearBoton("Enviar Correo", () => {
-    let mail = "sofiacermi@hotmail.com";
-    let asunto = `Estadísticas de juego de ${inventario.nombre}`;
-    let cuerpo = `¡Hola! Estas son mis estadísticas para que se incluyan en el juego.
+    if (!correoEnviado) {
+      correoEnviado = true;
+      let mail = "sofiacermi@hotmail.com";
+      let asunto = `Estadísticas de juego de ${inventario.nombre}`;
+      let cuerpo = `¡Hola! Estas son mis estadísticas para que se incluyan en el juego.
     
     {
       nombre: "${inventario.nombre}",
@@ -884,16 +905,385 @@ function finDelJuego() {
       logros: ${logrosTotales},
       tiempo: ${Math.round((final - comienzo) / 1000)},
     }`;
-
-    let mailtoLink = `mailto:${mail}?subject=${encodeURIComponent(
-      asunto
-    )}&body=${encodeURIComponent(cuerpo)}`;
-    window.location.href = mailtoLink;
+      let mailtoLink = `mailto:${mail}?subject=${encodeURIComponent(
+        asunto
+      )}&body=${encodeURIComponent(cuerpo)}`;
+      window.location.href = mailtoLink;
+    }
   });
   crearBoton("Reiniciar", inicio);
-  crearBoton("Estadísticas", () => {});
+  crearBoton("Estadísticas", estadistica);
 
   //FALTAN ESTADÍSTICAS
+}
+
+function estadistica() {
+  resetBotonera();
+  usuario.classList.add("oculto");
+  titulo.innerText = `Estadísticas`;
+  texto.innerHTML = `Aquí encontrarás las estadísticas de otros jugadores. Puedes buscar por nombres, filtrar por razas, ¡y hasta ver los stats de otros jugadores!<br><br>`;
+  declaracionDeJugadores();
+  /*jugadorFinal = {
+    nombre: inventario.nombre,
+    raza: inventario.raza,
+    clase: inventario.clase,
+    vida: healthBase,
+    iniciativa: inventario.iniciativa,
+    combate: inventario.combate,
+    defensa: inventario.defensa,
+    puntaje: puntaje,
+    logros: logrosTotales,
+    tiempo: Math.round((final - comienzo) / 1000),
+  };*/
+  jugadorFinal = {
+    nombre: "Hola",
+    raza: "Mago",
+    clase: "Nigromante",
+    vida: 10,
+    iniciativa: 0,
+    combate: 10,
+    defensa: 10,
+    puntaje: 94,
+    logros: 6,
+    tiempo: 60,
+  };
+  jugadores.push(jugadorFinal);
+  let tabla = document.createElement("div");
+  tabla.classList.add("tablaEstilo");
+  texto.appendChild(tabla);
+
+  //Sort jugadores
+  jugadores.sort(function (a, b) {
+    return b.puntaje - a.puntaje;
+  });
+
+  for (let i = 0; i < jugadores.length; i++) {
+    jugadores[i].num = i + 1;
+  }
+  console.log(jugadores);
+  jugadoresFiltrados = jugadores;
+  coincide = true;
+
+  crearTabla(tabla, jugadoresFiltrados, coincide);
+  crearBoton("Volver", finDelJuego);
+
+  crearBoton("Ordenar", () => {
+    ordenarDiv.classList.remove("oculto");
+    pergamino.classList.toggle("blurPergamino");
+    let nodes = botonera.getElementsByTagName("button");
+    for (let i = 0; i < nodes.length; i++) {
+      nodes[i].disabled = !nodes[i].disabled;
+    }
+    ordenarTitulo.innerText = `Ordenar estadísticas`;
+    ordenarTexto.innerText = `Selecciona como quieres ver las estadísticas de los jugadores.`;
+
+    columna1.innerHTML = `De menor a mayor`;
+    columna2.innerHTML = `De mayor a menor`;
+
+    crearBotonOrdenar("Puntaje", false, tabla);
+    crearBotonOrdenar("Logros", false, tabla);
+    crearBotonOrdenar("Tiempo", false, tabla);
+    crearBotonOrdenar("Vida", true, tabla);
+    crearBotonOrdenar("Iniciativa", true, tabla);
+    crearBotonOrdenar("Combate", true, tabla);
+    crearBotonOrdenar("Defensa", true, tabla);
+  });
+
+  crearBoton("Filtrar", () => {
+    ordenarDiv.classList.remove("oculto");
+    pergamino.classList.add("blurPergamino");
+    let nodes = botonera.getElementsByTagName("button");
+    for (let i = 0; i < nodes.length; i++) {
+      nodes[i].disabled = !nodes[i].disabled;
+    }
+    ordenarTitulo.innerText = "Filtrar Estadísticas";
+    ordenarTexto.innerText = `Selecciona la raza por la que quieres filtrar.`;
+    columna1.innerHTML = `Raza a filtrar`;
+    columna2.innerHTML = ``;
+    let razaFiltro = [];
+    jugadores.forEach((jugador) => {
+      if (!razaFiltro.includes(jugador.raza)) {
+        razaFiltro.push(jugador.raza);
+      }
+    });
+    console.log(razaFiltro);
+    razaFiltro.push("Todos");
+    for (let i = 0; i < razaFiltro.length; i++) {
+      crearBotonFiltrar(razaFiltro[i], tabla);
+    }
+  });
+
+  crearBoton("Buscar", () => {});
+
+  crearBoton("Stats", () => {
+    statsOLogros = !statsOLogros;
+    console.log(statsOLogros);
+    if (statsOLogros) {
+      window["botonStats"].innerText = "Puntaje";
+    } else {
+      window["botonStats"].innerText = "Stats";
+    }
+    tabla.innerHTML = "";
+    crearTabla(tabla, jugadoresFiltrados, coincide);
+  });
+}
+
+function crearBotonFiltrar(parametro, tabla) {
+  console.log(parametro);
+  window["boton" + parametro] = document.createElement("button");
+  window["boton" + parametro].innerText = parametro;
+  window["boton" + parametro].id = parametro.toLowerCase();
+  columna1.appendChild(window["boton" + parametro]);
+  window["boton" + parametro].addEventListener("click", () => {
+    coincide = false;
+    if (parametro == "Todos") {
+      coincide = true;
+      for (let i = 0; i < jugadores.length; i++) {
+        jugadores[i].num = i + 1;
+      }
+      ordenarDiv.classList.add("oculto");
+      pergamino.classList.remove("blurPergamino");
+      let nodes = botonera.getElementsByTagName("button");
+      for (let i = 0; i < nodes.length; i++) {
+        nodes[i].disabled = !nodes[i].disabled;
+      }
+      tabla.innerHTML = "";
+      crearTabla(tabla, jugadores, coincide);
+    } else {
+      columna2.HTML = ``;
+      columna2.innerHTML = `Clase a filtrar`;
+      let claseFiltro = ["Todos"];
+      jugadores.forEach((jugador) => {
+        if (!claseFiltro.includes(jugador.clase) && jugador.raza == parametro) {
+          claseFiltro.push(jugador.clase);
+        }
+      });
+      console.log(claseFiltro);
+      console.log(jugadores);
+
+      for (let i = 0; i < claseFiltro.length; i++) {
+        window["boton" + claseFiltro[i]] = document.createElement("button");
+        window["boton" + claseFiltro[i]].innerText = claseFiltro[i];
+        window["boton" + claseFiltro[i]].id = claseFiltro[i].toLowerCase();
+        columna2.appendChild(window["boton" + claseFiltro[i]]);
+        window["boton" + claseFiltro[i]].addEventListener("click", () => {
+          if (claseFiltro[i] == "Todos") {
+            jugadoresFiltrados = jugadores.filter(
+              (jugador) => jugador.raza == parametro
+            );
+            if (jugadorFinal.raza == parametro) {
+              coincide = true;
+            }
+            console.log(jugadoresFiltrados);
+          } else {
+            jugadoresFiltrados = jugadores.filter(
+              (jugador) => jugador.clase == claseFiltro[i]
+            );
+            if (
+              jugadorFinal.clase == claseFiltro[i] &&
+              jugadorFinal.raza == parametro
+            ) {
+              coincide = true;
+            }
+            console.log(jugadoresFiltrados);
+          }
+
+          console.log(jugadoresFiltrados);
+          for (let i = 0; i < jugadoresFiltrados.length; i++) {
+            jugadoresFiltrados[i].num = i + 1;
+          }
+          ordenarDiv.classList.add("oculto");
+          pergamino.classList.remove("blurPergamino");
+          let nodes = botonera.getElementsByTagName("button");
+          for (let i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = !nodes[i].disabled;
+          }
+          console.log(coincide);
+          tabla.innerHTML = "";
+          crearTabla(tabla, jugadoresFiltrados, coincide);
+        });
+      }
+    }
+  });
+}
+
+function crearBotonOrdenar(parametro, prueba, tabla) {
+  window["boton" + parametro + 1] = document.createElement("button");
+  window["boton" + parametro + 2] = document.createElement("button");
+  window["boton" + parametro + 1].innerText = parametro;
+  window["boton" + parametro + 2].innerText = parametro;
+  window["boton" + parametro + 1].id = parametro.toLowerCase();
+  window["boton" + parametro + 2].id = parametro.toLowerCase();
+
+  window["boton" + parametro + 1].addEventListener("click", () => {
+    propiedad = parametro.toLowerCase();
+    jugadoresFiltrados.sort(function (a, b) {
+      return a[propiedad] - b[propiedad];
+    });
+    ordenarFunciones(prueba, tabla);
+  });
+  window["boton" + parametro + 2].addEventListener("click", () => {
+    propiedad = parametro.toLowerCase();
+    jugadoresFiltrados.sort(function (a, b) {
+      return b[propiedad] - a[propiedad];
+    });
+    ordenarFunciones(prueba, tabla);
+  });
+  columna1.appendChild(window["boton" + parametro + 1]);
+  columna2.appendChild(window["boton" + parametro + 2]);
+}
+
+function ordenarFunciones(prueba, tabla) {
+  statsOLogros = prueba;
+  console.log(statsOLogros);
+  if (statsOLogros) {
+    window["botonStats"].innerText = "Puntaje";
+  } else {
+    window["botonStats"].innerText = "Stats";
+  }
+  for (let i = 0; i < jugadoresFiltrados.length; i++) {
+    jugadoresFiltrados[i].num = i + 1;
+  }
+  ordenarDiv.classList.add("oculto");
+  pergamino.classList.toggle("blurPergamino");
+  let nodes = botonera.getElementsByTagName("button");
+  for (let i = 0; i < nodes.length; i++) {
+    nodes[i].disabled = !nodes[i].disabled;
+  }
+  tabla.innerHTML = "";
+  crearTabla(tabla, jugadoresFiltrados, coincide);
+}
+
+function crearTabla(tabla, jugadores, jugadorBoo) {
+  let tablaG = document.createElement("table");
+  let tablaBody = document.createElement("tbody");
+  let tablaJug;
+  let tablaBJug;
+  if (jugadorBoo) {
+    tablaJug = document.createElement("table");
+    tablaBJug = document.createElement("tbody");
+  }
+
+  let titulos = [];
+  let titulosReal = [];
+  for (const propiedad in jugadores[0]) {
+    let propiedades = propiedad.replace(
+      propiedad[0],
+      propiedad[0].toUpperCase()
+    );
+    titulosReal.push(propiedad);
+    titulos.push(propiedades);
+  }
+  console.log(titulos);
+  let filaJugador;
+  if (jugadorBoo) {
+    filaJugador = document.createElement("tr");
+  }
+
+  // cells creation
+  let maxRows = jugadores.length;
+  console.log(maxRows);
+  if (maxRows >= 10) {
+    maxRows = 11;
+  } else {
+    maxRows++;
+  }
+
+  for (let j = 0; j < maxRows; j++) {
+    // table row creation
+    let fila = document.createElement("tr");
+    for (let i = 0; i < 1; i++) {
+      let celda = document.createElement("td");
+      let celdaJugador;
+      if (jugadorBoo) {
+        celdaJugador = document.createElement("td");
+      }
+      if (j == 0) {
+        celda.innerHTML = `<b>#</b>`;
+        if (jugadorBoo) {
+          celdaJugador.innerText = jugadores.find(function (jugador) {
+            return jugador.nombre == "Hola" && jugador.tiempo == 60;
+          }).num;
+          celdaJugador.style.width = `5%`;
+          filaJugador.appendChild(celdaJugador);
+        }
+      } else {
+        celda.innerText = jugadores[j - 1].num;
+      }
+      celda.style.width = `5%`;
+      fila.appendChild(celda);
+    }
+    for (let i = 0; i < 3; i++) {
+      let celda = document.createElement("td");
+      let celdaJugador;
+      if (jugadorBoo) {
+        celdaJugador = document.createElement("td");
+      }
+      if (j == 0) {
+        celda.innerHTML = `<b>${titulos[i]}</b>`;
+        if (jugadorBoo) {
+          celdaJugador.innerText = jugadorFinal[titulosReal[i]];
+          celdaJugador.style.width = `18%`;
+          filaJugador.appendChild(celdaJugador);
+        }
+      } else {
+        celda.innerText = jugadores[j - 1][titulosReal[i]];
+      }
+      celda.style.width = `18%`;
+      fila.appendChild(celda);
+    }
+
+    //7 a 10
+    if (!statsOLogros) {
+      for (let i = 7; i < 10; i++) {
+        let celda = document.createElement("td");
+        let celdaJugador;
+        if (jugadorBoo) {
+          celdaJugador = document.createElement("td");
+        }
+        if (j == 0) {
+          celda.innerHTML = `<b>${titulos[i]}</b>`;
+          if (jugadorBoo) {
+            celdaJugador.innerText = jugadorFinal[titulosReal[i]];
+            filaJugador.appendChild(celdaJugador);
+          }
+        } else {
+          celda.innerText = jugadores[j - 1][titulosReal[i]];
+        }
+
+        fila.appendChild(celda);
+      }
+    } else {
+      for (let i = 3; i < 7; i++) {
+        let celda = document.createElement("td");
+        let celdaJugador;
+        if (jugadorBoo) {
+          celdaJugador = document.createElement("td");
+        }
+        if (j == 0) {
+          celda.innerHTML = `<b>${titulos[i]}</b>`;
+          if (jugadorBoo) {
+            celdaJugador.innerText = jugadorFinal[titulosReal[i]];
+            filaJugador.appendChild(celdaJugador);
+          }
+        } else {
+          celda.innerText = jugadores[j - 1][titulosReal[i]];
+        }
+
+        fila.appendChild(celda);
+      }
+    }
+
+    tablaBody.appendChild(fila);
+  }
+  tablaG.appendChild(tablaBody);
+  tabla.appendChild(tablaG);
+  if (jugadorBoo) {
+    tablaBJug.appendChild(filaJugador);
+    tablaJug.appendChild(tablaBJug);
+    tabla.appendChild(tablaJug);
+    tablaJug.id = "hola";
+  }
 }
 
 function nextIndex(arrayInput, numeroID) {
@@ -1370,7 +1760,7 @@ function declaracionDeCaminos() {
 }
 
 function declaracionDeJugadores() {
-  let jugadores = [
+  jugadores = [
     {
       nombre: "Lord List",
       raza: "Humano",
@@ -1708,18 +2098,6 @@ function declaracionDeJugadores() {
       tiempo: 13,
     },
     {
-      nombre: "Lady Mary",
-      raza: "Enano",
-      clase: "Artesano",
-      vida: 11,
-      iniciativa: 1,
-      combate: 2,
-      defensa: 6,
-      puntaje: 19,
-      logros: 1,
-      tiempo: 2,
-    },
-    {
       nombre: "Dame Catherine",
       raza: "Orco",
       clase: "Carroñero",
@@ -1742,6 +2120,18 @@ function declaracionDeJugadores() {
       puntaje: 95,
       logros: 4,
       tiempo: 478,
+    },
+    {
+      nombre: "Lord Farquad",
+      raza: "Humano",
+      clase: "Cazador",
+      vida: 12,
+      iniciativa: 5,
+      combate: 13,
+      defensa: 2,
+      puntaje: 100,
+      logros: 5,
+      tiempo: 356,
     },
     {
       nombre: "Andy",
@@ -1767,18 +2157,6 @@ function declaracionDeJugadores() {
       logros: 4,
       tiempo: 438,
     },
-    {
-      nombre: "Lord Farquad",
-      raza: "Humano",
-      clase: "Cazador",
-      vida: 12,
-      iniciativa: 5,
-      combate: 13,
-      defensa: 2,
-      puntaje: 100,
-      logros: 5,
-      tiempo: 356,
-    },
   ];
 }
 
@@ -1789,8 +2167,8 @@ function creacionAdicionales() {
     scrollDiv.scrollTo(0, 0);
     if (!inventario) {
       pergamino.classList.toggle("blurPergamino");
-      var nodes = botonera.getElementsByTagName("button");
-      for (var i = 0; i < nodes.length; i++) {
+      let nodes = botonera.getElementsByTagName("button");
+      for (let i = 0; i < nodes.length; i++) {
         nodes[i].disabled = !nodes[i].disabled;
       }
     } else {
@@ -1825,4 +2203,25 @@ function creacionAdicionales() {
     )}&body=${encodeURIComponent(cuerpo)}`;
     window.location.href = mailtoLink;
   });
+}
+
+function levantarDOM() {
+  texto = document.getElementById("texto");
+  botonera = document.getElementById("botonera");
+  titulo = document.getElementById("titulo");
+  input = document.getElementById("input");
+  personajesHTML = document.getElementById("personajesHTML");
+  usuario = document.getElementById("usuario");
+  oponente = document.getElementById("oponente");
+  inventarioHTML = document.getElementById("inventario");
+  pergamino = document.getElementById("pergamino");
+  detalles = document.getElementById("detalles");
+  mostrarDetalles = document.getElementById("mostrarDetalles");
+  scrollDiv = document.getElementById("scroll");
+  sendEmail = document.getElementById("sendEmail");
+  ordenarDiv = document.getElementById("ordenarDiv");
+  ordenarTitulo = document.getElementById("ordenarTitulo");
+  ordenarTexto = document.getElementById("ordenarTexto");
+  columna1 = document.getElementById("columna1");
+  columna2 = document.getElementById("columna2");
 }

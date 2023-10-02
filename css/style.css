@@ -238,7 +238,8 @@ p {
   margin-left: 200px;
 }
 
-#mostrarDetalles {
+#mostrarDetalles,
+#ordenarDiv {
   position: absolute;
   border: 2px solid #936b47;
   background-color: #ecd495;
@@ -254,23 +255,27 @@ p {
   border-radius: 20px;
   text-align: justify;
 }
-#mostrarDetalles .box {
+#mostrarDetalles .box,
+#ordenarDiv .box {
   padding-top: 5px;
   padding-left: 30px;
   padding-right: 30px;
 }
-#mostrarDetalles #scroll {
+#mostrarDetalles #scroll,
+#ordenarDiv #scroll {
   height: 250px;
   width: 100%;
   text-align: justify;
   overflow: auto;
 }
-#mostrarDetalles #scroll .inside {
+#mostrarDetalles #scroll .inside,
+#ordenarDiv #scroll .inside {
   padding-bottom: 5px;
   padding-left: 30px;
   padding-right: 30px;
 }
-#mostrarDetalles #scroll .inside .titulo {
+#mostrarDetalles #scroll .inside .titulo,
+#ordenarDiv #scroll .inside .titulo {
   width: 100%;
   font-weight: bold;
   text-align: center;
@@ -289,9 +294,39 @@ footer {
   width: 100%;
   display: flex;
   justify-content: center;
+  align-items: center;
+  height: 26px;
 }
 footer #sendEmail {
   cursor: pointer;
+}
+
+.tablaEstilo table {
+  border: 1px solid black;
+  width: 100%;
+  table-layout: fixed;
+  font-size: 0.85em;
+}
+.tablaEstilo table td {
+  text-align: center;
+}
+
+#hola {
+  background-color: red;
+}
+
+.contenedor {
+  display: flex;
+  align-items: top;
+  justify-content: space-between;
+}
+.contenedor #columna1,
+.contenedor #columna2 {
+  display: flex;
+  flex-direction: column;
+  margin-left: 20px;
+  margin-right: 20px;
+  text-align: center;
 }
 
 /*# sourceMappingURL=style.css.map */
