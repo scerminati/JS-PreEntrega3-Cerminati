@@ -432,7 +432,6 @@ function seleccionarRaza(razaSeleccionada) {
   );
   resetBotonera();
   texto.innerHTML = `Haz escogido la raza ${razaPersonaje[0].raza}. A continuación las clases más comunes de esta raza. Debes escoger uno para continuar.`;
-  //AÑADIR COMENTARIO DE CADA UNA DE LAS HABILIDADES
   let personajesAElegir = "";
   personajesHTML.classList.remove("oculto");
   idActual = 0;
@@ -444,7 +443,10 @@ function seleccionarRaza(razaSeleccionada) {
     personajesAElegir = "";
     let personajeCaja = document.createElement("div");
     for (const propiedad in personaje) {
-      if (
+      if (propiedad == "clase") {
+        personajesAElegir += `<center><b>${personaje[propiedad]}</b></center>`;
+      } else if (
+        propiedad != "clase" &&
         propiedad != "raza" &&
         propiedad != "imagen" &&
         propiedad != "armaAEncontrar" &&
@@ -456,7 +458,6 @@ function seleccionarRaza(razaSeleccionada) {
         )}:</b> ${personaje[propiedad]}<br>`;
       }
     }
-    personajesAElegir += `<br>`;
     personajeCaja.innerHTML = personajesAElegir;
     personajesHTML.appendChild(personajeCaja);
   });

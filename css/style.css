@@ -296,6 +296,7 @@ footer {
   justify-content: center;
   align-items: center;
   height: 26px;
+  display: flex;
 }
 footer #sendEmail {
   cursor: pointer;
@@ -336,6 +337,54 @@ footer #sendEmail {
 
 .mostrarResultados {
   min-height: 120px;
+}
+
+@media screen and (max-width: 992px) {
+  h1 {
+    font-size: 80px;
+  }
+  h2 {
+    font-size: 25px;
+  }
+  footer {
+    height: 38px;
+  }
+  .detalleFirst {
+    z-index: 3;
+    margin-left: 500px;
+    margin-top: -25px;
+  }
+  .detalleInv {
+    z-index: 5;
+    position: absolute;
+    top: 525px;
+    margin-left: 200px;
+  }
+  #inventario {
+    top: 247px;
+  }
+  #mostrarDetalles,
+  #ordenarDiv {
+    top: 247px;
+  }
+  #usuario {
+    margin-left: -400px;
+    margin-bottom: -104px;
+  }
+  #oponente {
+    margin-left: 400px;
+    margin-bottom: -74px;
+  }
+  #pergamino {
+    margin-top: 50px;
+    width: 500px;
+  }
+  .tablaEstilo table {
+    font-size: 0.75em;
+  }
+  #personajesHTML {
+    font-size: 0.9em;
+  }
 }
 
 /*# sourceMappingURL=style.css.map */
