@@ -931,6 +931,19 @@ function estadistica() {
     tiempo: Math.round((final - comienzo) / 1000),
   };
 
+  /*jugadorFinal = {
+    nombre: "hola",
+    raza: "nueva",
+    clase: "holis",
+    vida: 20,
+    iniciativa: 5,
+    combate: 6,
+    defensa: 7,
+    puntaje: 100,
+    logros: 6,
+    tiempo: 2,
+  };*/
+
   jugadores.push(jugadorFinal);
   let tabla = document.createElement("div");
   tabla.classList.add("tablaEstilo");
@@ -944,7 +957,9 @@ function estadistica() {
   for (let i = 0; i < jugadores.length; i++) {
     jugadores[i].num = i + 1;
   }
+
   jugadoresFiltrados = jugadores;
+  console.log(jugadoresFiltrados);
   coincide = true;
 
   crearTabla(tabla, jugadoresFiltrados, coincide);
@@ -973,6 +988,7 @@ function estadistica() {
   });
 
   crearBoton("Filtrar", () => {
+    jugadoresFiltrados = jugadores;
     ordenarDiv.classList.remove("oculto");
     pergamino.classList.add("blurPergamino");
     let nodes = botonera.getElementsByTagName("button");
@@ -1275,7 +1291,10 @@ function crearTabla(tabla, jugadores, jugadorBoo) {
         celda.innerHTML = `<b>#</b>`;
         if (jugadorBoo) {
           celdaJugador.innerText = jugadores.find(function (jugador) {
-            return jugador.nombre == "Hola" && jugador.tiempo == 60;
+            return (
+              jugador.nombre == jugadorFinal.nombre &&
+              jugador.tiempo == jugadorFinal.tiempo
+            );
           }).num;
           celdaJugador.style.width = `5%`;
           filaJugador.appendChild(celdaJugador);
