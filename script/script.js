@@ -375,7 +375,6 @@ function setNombre(id) {
   texto.innerHTML += `<br><br>Introduce tu nombre aquí debajo. ¡No te preocupes! No estarás firmando ningún contrato...<br><br>Por ahora.`;
   input.classList.remove("oculto");
   input.maxLength = 14 - nombre.length;
-  console.log(input.maxLength);
   resetBotonera();
   crearBoton("Borrar", () => {
     input.value = "";
@@ -384,6 +383,7 @@ function setNombre(id) {
   input.addEventListener("keyup", (e) => {
     e.key === "Enter" && enviarInput();
   });
+  input.addEventListener("change", enviarInput);
 }
 
 function enviarInput() {
@@ -437,7 +437,6 @@ function seleccionarRaza(razaSeleccionada) {
   personajesHTML.classList.remove("oculto");
   idActual = 0;
   detalles.classList.remove("oculto");
-  console.log(inventario);
   detalles.classList.remove("detalleInv");
   detalles.classList.add("detalleFirst");
   personajesHTML.innerHTML = "";
@@ -628,7 +627,6 @@ function inputChecker(arrayInput) {
   localStorage.setItem("id", JSON.stringify(id));
   localStorage.setItem("index", index);
   localStorage.setItem("idActual", idActual);
-  console.log(index);
   titulo.innerText = arrayInput[index].categoria;
   idACambiar = -1;
   chequeoInput = false;
@@ -960,7 +958,6 @@ function estadistica() {
   for (let i = 0; i < jugadores.length; i++) {
     jugadores[i].num = i + 1;
   }
-  console.log(jugadores);
   jugadoresFiltrados = jugadores;
   coincide = true;
 
@@ -1006,18 +1003,41 @@ function estadistica() {
         razaFiltro.push(jugador.raza);
       }
     });
-    console.log(razaFiltro);
     razaFiltro.push("Todos");
     for (let i = 0; i < razaFiltro.length; i++) {
       crearBotonFiltrar(razaFiltro[i], tabla);
     }
   });
 
-  crearBoton("Buscar", () => {});
+  /*crearBoton("Buscar", () => {
+    let anterior = jugadoresFiltrados;
+    let anteriorCoincide = coincide;
+    ordenarDiv.classList.remove("oculto");
+    pergamino.classList.add("blurPergamino");
+    let nodes = botonera.getElementsByTagName("button");
+    for (let i = 0; i < nodes.length; i++) {
+      nodes[i].disabled = !nodes[i].disabled;
+    }
+    ordenarTitulo.innerText = "Buscar por Nombre";
+    ordenarTexto.innerText = `Encuentra el nombre que deseas buscar entre la base de datos de los jugadores.`;
+    columna1.innerHTML = ``;
+    columna2.classList.add("oculto");
+
+    let jugadorBuscado = document.createElement("input");
+    columna1.appendChild(jugadorBuscado);
+    jugadorBuscado.addEventListener("input", () => {
+      jugadoresEncontrados = jugadores.find((jugador) =>
+        jugador.nombre.includes(jugadorBuscado.value)
+      );
+    });
+
+    let mostrarResultados = document.createElement("div");
+    columna1.appendChild(mostrarResultados);
+    mostrarResultados.style.height = `50px`;
+  });*/
 
   crearBoton("Stats", () => {
     statsOLogros = !statsOLogros;
-    console.log(statsOLogros);
     if (statsOLogros) {
       window["botonStats"].innerText = "Puntaje";
     } else {
@@ -1029,7 +1049,6 @@ function estadistica() {
 }
 
 function crearBotonFiltrar(parametro, tabla) {
-  console.log(parametro);
   window["boton" + parametro] = document.createElement("button");
   window["boton" + parametro].innerText = parametro;
   window["boton" + parametro].id = parametro.toLowerCase();
@@ -1058,8 +1077,6 @@ function crearBotonFiltrar(parametro, tabla) {
           claseFiltro.push(jugador.clase);
         }
       });
-      console.log(claseFiltro);
-      console.log(jugadores);
 
       for (let i = 0; i < claseFiltro.length; i++) {
         window["boton" + claseFiltro[i]] = document.createElement("button");
@@ -1074,7 +1091,6 @@ function crearBotonFiltrar(parametro, tabla) {
             if (jugadorFinal.raza == parametro) {
               coincide = true;
             }
-            console.log(jugadoresFiltrados);
           } else {
             jugadoresFiltrados = jugadores.filter(
               (jugador) => jugador.clase == claseFiltro[i]
@@ -1085,10 +1101,9 @@ function crearBotonFiltrar(parametro, tabla) {
             ) {
               coincide = true;
             }
-            console.log(jugadoresFiltrados);
           }
 
-          console.log(jugadoresFiltrados);
+
           for (let i = 0; i < jugadoresFiltrados.length; i++) {
             jugadoresFiltrados[i].num = i + 1;
           }
@@ -1098,7 +1113,6 @@ function crearBotonFiltrar(parametro, tabla) {
           for (let i = 0; i < nodes.length; i++) {
             nodes[i].disabled = !nodes[i].disabled;
           }
-          console.log(coincide);
           tabla.innerHTML = "";
           crearTabla(tabla, jugadoresFiltrados, coincide);
         });
@@ -1135,7 +1149,6 @@ function crearBotonOrdenar(parametro, prueba, tabla) {
 
 function ordenarFunciones(prueba, tabla) {
   statsOLogros = prueba;
-  console.log(statsOLogros);
   if (statsOLogros) {
     window["botonStats"].innerText = "Puntaje";
   } else {
@@ -1174,15 +1187,12 @@ function crearTabla(tabla, jugadores, jugadorBoo) {
     titulosReal.push(propiedad);
     titulos.push(propiedades);
   }
-  console.log(titulos);
   let filaJugador;
   if (jugadorBoo) {
     filaJugador = document.createElement("tr");
   }
 
-  // cells creation
   let maxRows = jugadores.length;
-  console.log(maxRows);
   if (maxRows >= 10) {
     maxRows = 11;
   } else {
@@ -1190,7 +1200,6 @@ function crearTabla(tabla, jugadores, jugadorBoo) {
   }
 
   for (let j = 0; j < maxRows; j++) {
-    // table row creation
     let fila = document.createElement("tr");
     for (let i = 0; i < 1; i++) {
       let celda = document.createElement("td");
@@ -1233,7 +1242,6 @@ function crearTabla(tabla, jugadores, jugadorBoo) {
       fila.appendChild(celda);
     }
 
-    //7 a 10
     if (!statsOLogros) {
       for (let i = 7; i < 10; i++) {
         let celda = document.createElement("td");
