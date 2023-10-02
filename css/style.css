@@ -348,7 +348,7 @@ footer #sendEmail {
   }
   footer {
     height: 38px;
-    font-size: 0.8em;
+    font-size: 0.7em;
   }
   .detalleFirst {
     z-index: 3;
@@ -386,10 +386,14 @@ footer #sendEmail {
     margin: 2px;
   }
   .tablaEstilo table {
-    font-size: 0.6em;
+    font-size: 0.56em;
   }
   #personajesHTML {
     font-size: 0.9em;
+  }
+  #texto {
+    overflow: auto;
+    max-height: 325px;
   }
 }
 

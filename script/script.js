@@ -1316,13 +1316,13 @@ function crearTabla(tabla, jugadores, jugadorBoo) {
         celda.innerHTML = `<b>${titulos[i]}</b>`;
         if (jugadorBoo) {
           celdaJugador.innerText = jugadorFinal[titulosReal[i]];
-          celdaJugador.style.width = `18%`;
+          celdaJugador.style.width = `15%`;
           filaJugador.appendChild(celdaJugador);
         }
       } else {
         celda.innerText = jugadores[j - 1][titulosReal[i]];
       }
-      celda.style.width = `18%`;
+      celda.style.width = `16%`;
       fila.appendChild(celda);
     }
 
@@ -2248,6 +2248,18 @@ function declaracionDeJugadores() {
       puntaje: 95,
       logros: 4,
       tiempo: 438,
+    },
+    {
+      nombre: "Dame Cindy",
+      raza: "Elfo",
+      clase: "Asesino",
+      vida: 16,
+      iniciativa: 6,
+      combate: 10,
+      defensa: 0,
+      puntaje: 60,
+      logros: 3,
+      tiempo: 691,
     },
   ];
 }
