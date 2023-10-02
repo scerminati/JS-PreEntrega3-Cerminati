@@ -341,46 +341,52 @@ footer #sendEmail {
 
 @media screen and (max-width: 992px) {
   h1 {
-    font-size: 80px;
+    font-size: 60px;
   }
   h2 {
-    font-size: 25px;
+    font-size: 20px;
   }
   footer {
     height: 38px;
+    font-size: 0.8em;
   }
   .detalleFirst {
     z-index: 3;
-    margin-left: 500px;
+    margin-left: 400px;
     margin-top: -25px;
   }
   .detalleInv {
     z-index: 5;
     position: absolute;
-    top: 525px;
+    top: 470px;
     margin-left: 200px;
   }
   #inventario {
-    top: 247px;
+    top: 190px;
   }
   #mostrarDetalles,
   #ordenarDiv {
-    top: 247px;
+    top: 130px;
   }
   #usuario {
-    margin-left: -400px;
-    margin-bottom: -104px;
+    margin-top: -35px;
+    margin-left: -350px;
+    margin-bottom: -65px;
   }
   #oponente {
-    margin-left: 400px;
-    margin-bottom: -74px;
+    margin-left: 350px;
+    margin-top: -35px;
+    margin-bottom: -65px;
   }
   #pergamino {
-    margin-top: 50px;
-    width: 500px;
+    margin-top: 25px;
+    width: 400px;
+  }
+  #botonera button {
+    margin: 2px;
   }
   .tablaEstilo table {
-    font-size: 0.75em;
+    font-size: 0.6em;
   }
   #personajesHTML {
     font-size: 0.9em;
