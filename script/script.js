@@ -258,8 +258,8 @@ personajes.forEach((personaje) => {
 //Detalles adicionales de combate, creación de botones y footer con opción a enviar correo + levantar elementos DOM.
 levantarDOM();
 creacionAdicionales();
-estadistica();
-//inicio();
+//estadistica();
+inicio();
 
 // Inicialización de variables globales disponibles para reset.
 function inicio() {
@@ -493,7 +493,6 @@ function realizarInventario(razaPersonaje, personajeEscogido) {
 
   detalles.classList.add("detalleInv");
   detalles.classList.remove("detalleFirst");
-  console.log(inventario);
   detalles.classList.add("oculto");
   usuario.classList.remove("oculto");
   usuario.innerHTML = imagenPersonaje.ruta;
@@ -911,8 +910,6 @@ function finDelJuego() {
   });
   crearBoton("Reiniciar", inicio);
   crearBoton("Estadísticas", estadistica);
-
-  //FALTAN ESTADÍSTICAS
 }
 
 function estadistica() {
@@ -921,7 +918,7 @@ function estadistica() {
   titulo.innerText = `Estadísticas`;
   texto.innerHTML = `Aquí encontrarás las estadísticas de otros jugadores. Puedes buscar por nombres, filtrar por razas, ¡y hasta ver los stats de otros jugadores!<br><br>`;
   declaracionDeJugadores();
-  /*jugadorFinal = {
+  jugadorFinal = {
     nombre: inventario.nombre,
     raza: inventario.raza,
     clase: inventario.clase,
@@ -932,19 +929,8 @@ function estadistica() {
     puntaje: puntaje,
     logros: logrosTotales,
     tiempo: Math.round((final - comienzo) / 1000),
-  };*/
-  jugadorFinal = {
-    nombre: "Hola",
-    raza: "Mago",
-    clase: "Nigromante",
-    vida: 10,
-    iniciativa: 0,
-    combate: 10,
-    defensa: 10,
-    puntaje: 94,
-    logros: 6,
-    tiempo: 60,
   };
+
   jugadores.push(jugadorFinal);
   let tabla = document.createElement("div");
   tabla.classList.add("tablaEstilo");
@@ -1009,9 +995,15 @@ function estadistica() {
     }
   });
 
-  /*crearBoton("Buscar", () => {
+  crearBoton("Buscar", () => {
+    botonesBuscador.classList.remove("oculto");
+    botonesBuscador.innerHTML = "";
     let anterior = jugadoresFiltrados;
     let anteriorCoincide = coincide;
+    botonBuscar = document.createElement("button");
+    botonBuscar.innerText = "Buscar";
+    botonesBuscador.appendChild(botonBuscar);
+    botonBuscar.classList.add("oculto");
     ordenarDiv.classList.remove("oculto");
     pergamino.classList.add("blurPergamino");
     let nodes = botonera.getElementsByTagName("button");
@@ -1022,19 +1014,92 @@ function estadistica() {
     ordenarTexto.innerText = `Encuentra el nombre que deseas buscar entre la base de datos de los jugadores.`;
     columna1.innerHTML = ``;
     columna2.classList.add("oculto");
-
     let jugadorBuscado = document.createElement("input");
+    jugadorBuscado.classList.add("jugadorBuscado");
+    jugadorBuscado.placeholder = `Introduce aquí un nombre.`;
     columna1.appendChild(jugadorBuscado);
+    let mostrarResultados = document.createElement("div");
+    mostrarResultados.classList.add("mostrarResultados");
+    columna1.appendChild(mostrarResultados);
+
+    jugadorBuscado.value = "";
+    let jugadoresEncontrados = [];
     jugadorBuscado.addEventListener("input", () => {
-      jugadoresEncontrados = jugadores.find((jugador) =>
-        jugador.nombre.includes(jugadorBuscado.value)
-      );
+      if (jugadorBuscado.value != "") {
+        jugadoresEncontrados = jugadores.filter((jugador) =>
+          jugador.nombre
+            .toLowerCase()
+            .includes(jugadorBuscado.value.toLowerCase())
+        );
+
+        limite = jugadoresEncontrados.length;
+        if (limite > 5) {
+          limite = 5;
+        }
+        mostrarResultados.innerHTML = ``;
+        if (limite == 0) {
+          mostrarResultados.innerText = `No se encontró ningún nombre que coincida`;
+        } else {
+          mostrarResultados.innerHTML = `Los nombres encontrados son:<br><br>`;
+          for (let i = 0; i < limite; i++) {
+            mostrarResultados.innerHTML += `${jugadoresEncontrados[i].nombre}<br>`;
+          }
+        }
+
+        if (limite > 0) {
+          botonBuscar.classList.remove("oculto");
+        } else {
+          botonBuscar.classList.add("oculto");
+        }
+      } else {
+        mostrarResultados.innerHTML = ``;
+        botonBuscar.classList.add("oculto");
+      }
     });
 
-    let mostrarResultados = document.createElement("div");
-    columna1.appendChild(mostrarResultados);
-    mostrarResultados.style.height = `50px`;
-  });*/
+    botonBuscar.addEventListener("click", () => {
+      botonesBuscador.classList.add("oculto");
+      coincide = false;
+      ordenarDiv.classList.add("oculto");
+      columna2.classList.remove("oculto");
+      pergamino.classList.remove("blurPergamino");
+      let nodes = botonera.getElementsByTagName("button");
+      for (let i = 0; i < nodes.length; i++) {
+        nodes[i].disabled = !nodes[i].disabled;
+      }
+      jugadoresFiltrados = jugadoresEncontrados;
+      for (let i = 0; i < jugadoresFiltrados.length; i++) {
+        jugadoresFiltrados[i].num = i + 1;
+        if (
+          jugadoresFiltrados[i].nombre == jugadorFinal.nombre &&
+          jugadoresFiltrados[i].tiempo == jugadorFinal.tiempo
+        ) {
+          coincide = true;
+        }
+      }
+
+      tabla.innerHTML = "";
+      crearTabla(tabla, jugadoresFiltrados, coincide);
+    });
+
+    botonVolver = document.createElement("button");
+    botonVolver.innerText = "Volver";
+    botonVolver.addEventListener("click", () => {
+      botonesBuscador.classList.add("oculto");
+      columna2.classList.remove("oculto");
+      jugadoresFiltrados = anterior;
+      coincide = anteriorCoincide;
+      ordenarDiv.classList.add("oculto");
+      pergamino.classList.remove("blurPergamino");
+      let nodes = botonera.getElementsByTagName("button");
+      for (let i = 0; i < nodes.length; i++) {
+        nodes[i].disabled = !nodes[i].disabled;
+      }
+      tabla.innerHTML = "";
+      crearTabla(tabla, jugadoresFiltrados, coincide);
+    });
+    botonesBuscador.appendChild(botonVolver);
+  });
 
   crearBoton("Stats", () => {
     statsOLogros = !statsOLogros;
@@ -1102,7 +1167,6 @@ function crearBotonFiltrar(parametro, tabla) {
               coincide = true;
             }
           }
-
 
           for (let i = 0; i < jugadoresFiltrados.length; i++) {
             jugadoresFiltrados[i].num = i + 1;
@@ -2232,4 +2296,5 @@ function levantarDOM() {
   ordenarTexto = document.getElementById("ordenarTexto");
   columna1 = document.getElementById("columna1");
   columna2 = document.getElementById("columna2");
+  botonesBuscador = document.getElementById("botonesBuscador");
 }

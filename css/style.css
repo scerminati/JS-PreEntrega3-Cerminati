@@ -329,4 +329,13 @@ footer #sendEmail {
   text-align: center;
 }
 
+.jugadorBuscado {
+  width: 300px;
+  margin: 5px;
+}
+
+.mostrarResultados {
+  min-height: 120px;
+}
+
 /*# sourceMappingURL=style.css.map */
