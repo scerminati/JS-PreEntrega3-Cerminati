@@ -299,6 +299,11 @@ footer {
   #sendEmail {
     cursor: pointer;
   }
+  p {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 }
 
 .tablaEstilo {
@@ -313,8 +318,8 @@ footer {
   }
 }
 
-#hola {
-  background-color: red;
+#lineaUsuario {
+  background-color: #936b47;
 }
 
 .contenedor {

@@ -916,7 +916,7 @@ function estadistica() {
   resetBotonera();
   usuario.classList.add("oculto");
   titulo.innerText = `Estadísticas`;
-  texto.innerHTML = `Aquí encontrarás las estadísticas de otros jugadores. Puedes buscar por nombres, filtrar por razas, ¡y hasta ver los stats de otros jugadores!<br><br>`;
+  texto.innerHTML = `Aquí encontrarás las estadísticas de otros jugadores. Puedes buscar por nombres, filtrar por razas, ¡y hasta ver los stats de otros jugadores! Abajo encontrarás tu posición resaltada de acuerdo a cómo quieres ordenar los datos.<br><br>`;
   declaracionDeJugadores();
   jugadorFinal = {
     nombre: inventario.nombre,
@@ -930,19 +930,6 @@ function estadistica() {
     logros: logrosTotales,
     tiempo: Math.round((final - comienzo) / 1000),
   };
-
-  /*jugadorFinal = {
-    nombre: "hola",
-    raza: "nueva",
-    clase: "holis",
-    vida: 20,
-    iniciativa: 5,
-    combate: 6,
-    defensa: 7,
-    puntaje: 100,
-    logros: 6,
-    tiempo: 2,
-  };*/
 
   jugadores.push(jugadorFinal);
   let tabla = document.createElement("div");
@@ -1386,7 +1373,7 @@ function crearTabla(tabla, jugadores, jugadorBoo) {
     tablaBJug.appendChild(filaJugador);
     tablaJug.appendChild(tablaBJug);
     tabla.appendChild(tablaJug);
-    tablaJug.id = "hola";
+    tablaJug.id = "lineaUsuario";
   }
 }
 

@@ -300,6 +300,11 @@ footer {
 footer #sendEmail {
   cursor: pointer;
 }
+footer p {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
 .tablaEstilo table {
   border: 1px solid black;
@@ -311,8 +316,8 @@ footer #sendEmail {
   text-align: center;
 }
 
-#hola {
-  background-color: red;
+#lineaUsuario {
+  background-color: #936b47;
 }
 
 .contenedor {
