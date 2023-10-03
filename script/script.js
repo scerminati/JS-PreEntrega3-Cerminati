@@ -887,7 +887,7 @@ function finDelJuego() {
     if (!correoEnviado) {
       correoEnviado = true;
       let mail = "sofiacermi@hotmail.com";
-      let asunto = `Estadísticas de juego de ${inventario.nombre}`;
+      let asunto = `Javascra - Estadísticas de juego de ${inventario.nombre}`;
       let cuerpo = `¡Hola! Estas son mis estadísticas para que se incluyan en el juego.
     
     {
@@ -2273,6 +2273,18 @@ function declaracionDeJugadores() {
       tiempo: 691,
     },
     {
+      nombre: "Sir Miguelo",
+      raza: "Mago",
+      clase: "Nigromante",
+      vida: 15,
+      iniciativa: 1,
+      combate: 12,
+      defensa: 4,
+      puntaje: 100,
+      logros: 5,
+      tiempo: 281,
+    },
+    {
       nombre: "Lord Nekro",
       raza: "Humano",
       clase: "Caballero",
@@ -2283,6 +2295,18 @@ function declaracionDeJugadores() {
       puntaje: 100,
       logros: 5,
       tiempo: 66,
+    },
+    {
+      nombre: "Sir Legolas",
+      raza: "Elfo",
+      clase: "Asesino",
+      vida: 16,
+      iniciativa: 6,
+      combate: 23,
+      defensa: 5,
+      puntaje: 100,
+      logros: 6,
+      tiempo: 1105,
     },
   ];
 }
