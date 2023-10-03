@@ -1280,6 +1280,7 @@ function crearTabla(tabla, jugadores, jugadorBoo) {
     maxRows++;
   }
 
+  let tiempomod;
   for (let j = 0; j < maxRows; j++) {
     let fila = document.createElement("tr");
     for (let i = 0; i < 1; i++) {
@@ -1316,7 +1317,7 @@ function crearTabla(tabla, jugadores, jugadorBoo) {
         celda.innerHTML = `<b>${titulos[i]}</b>`;
         if (jugadorBoo) {
           celdaJugador.innerText = jugadorFinal[titulosReal[i]];
-          celdaJugador.style.width = `15%`;
+          celdaJugador.style.width = `16%`;
           filaJugador.appendChild(celdaJugador);
         }
       } else {
@@ -1335,12 +1336,27 @@ function crearTabla(tabla, jugadores, jugadorBoo) {
         }
         if (j == 0) {
           celda.innerHTML = `<b>${titulos[i]}</b>`;
+          if (titulos[i] == "Tiempo") {
+            tiempomod = i;
+            console.log(tiempomod);
+          }
           if (jugadorBoo) {
-            celdaJugador.innerText = jugadorFinal[titulosReal[i]];
+            if (i == tiempomod) {
+              celdaJugador.innerText = modificarTiempo(
+                jugadorFinal[titulosReal[i]]
+              );
+            } else {
+              celdaJugador.innerText = jugadorFinal[titulosReal[i]];
+            }
             filaJugador.appendChild(celdaJugador);
           }
         } else {
-          celda.innerText = jugadores[j - 1][titulosReal[i]];
+          console.log(tiempomod);
+          if (i == tiempomod) {
+            celda.innerText = modificarTiempo(jugadores[j - 1][titulosReal[i]]);
+          } else {
+            celda.innerText = jugadores[j - 1][titulosReal[i]];
+          }
         }
 
         fila.appendChild(celda);
@@ -1404,6 +1420,18 @@ function modificarNextId(arrayInput, nextIDacambiar, nextID) {
     return camino.id == nextIDacambiar;
   });
   arrayInput[i].nextid = nextID;
+}
+
+function modificarTiempo(celda) {
+  //celda me lo da en segundos.
+  let horas = Math.floor(celda) / (60 * 60);
+  let horasAmostrar = Math.floor(horas);
+  let minutos = (horas - horasAmostrar) * 60;
+  let minutosAmostrar = Math.floor(minutos);
+  let segundos = Math.floor((minutos - minutosAmostrar) * 60);
+  return `${horasAmostrar.toString().padStart(2, "0")}:${minutosAmostrar
+    .toString()
+    .padStart(2, "0")}:${segundos.toString().padStart(2, "0")}`;
 }
 
 function combate(oponente) {
@@ -2200,7 +2228,7 @@ function declaracionDeJugadores() {
       puntaje: 39,
       logros: 0,
       tiempo: 10,
-    },
+    }, // Datos reales.
     {
       nombre: "Sir Hellrider",
       raza: "Orco",
@@ -2260,6 +2288,18 @@ function declaracionDeJugadores() {
       puntaje: 60,
       logros: 3,
       tiempo: 691,
+    },
+    {
+      nombre: "Lord Nekro",
+      raza: "Humano",
+      clase: "Caballero",
+      vida: 18,
+      iniciativa: 0,
+      combate: 9,
+      defensa: 5,
+      puntaje: 100,
+      logros: 5,
+      tiempo: 66,
     },
   ];
 }
