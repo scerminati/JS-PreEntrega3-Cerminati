@@ -258,7 +258,6 @@ personajes.forEach((personaje) => {
 //Detalles adicionales de combate, creación de botones y footer con opción a enviar correo + levantar elementos DOM.
 levantarDOM();
 creacionAdicionales();
-//estadistica();
 inicio();
 
 // Inicialización de variables globales disponibles para reset.
@@ -950,7 +949,7 @@ function estadistica() {
   tabla.classList.add("tablaEstilo");
   texto.appendChild(tabla);
 
-  //Sort jugadores
+  //Sort jugadores por puntaje para poner en primera tabla.
   jugadores.sort(function (a, b) {
     return b.puntaje - a.puntaje;
   });
@@ -960,7 +959,6 @@ function estadistica() {
   }
 
   jugadoresFiltrados = jugadores;
-  console.log(jugadoresFiltrados);
   coincide = true;
 
   crearTabla(tabla, jugadoresFiltrados, coincide);
@@ -1338,7 +1336,6 @@ function crearTabla(tabla, jugadores, jugadorBoo) {
           celda.innerHTML = `<b>${titulos[i]}</b>`;
           if (titulos[i] == "Tiempo") {
             tiempomod = i;
-            console.log(tiempomod);
           }
           if (jugadorBoo) {
             if (i == tiempomod) {
@@ -1351,7 +1348,6 @@ function crearTabla(tabla, jugadores, jugadorBoo) {
             filaJugador.appendChild(celdaJugador);
           }
         } else {
-          console.log(tiempomod);
           if (i == tiempomod) {
             celda.innerText = modificarTiempo(jugadores[j - 1][titulosReal[i]]);
           } else {
@@ -1782,7 +1778,7 @@ function declaracionDeCaminos() {
     {
       id: 3.2,
       descripcion: `"¡Buenos días! ¿Usted es ${inventario.nombre}? ¡Ya me parecía! He escuchado mucho de usted. ¡Hice bien en llamar su atención!"<br><br>
-      "Tengo hoy en oferta esta hermosa soga que le permitirá atravesar hasta los más temibles obstáculos. ¡Solo 10 monedas! ¡Es una oferta de tiempo limitado! Entiéndame, estamos aquí para generar ganancias, ¿cierto? Después de todo, debo cenar esta noche, y mi familia también."`, //Cambiar intro.
+      "Tengo hoy en oferta esta hermosa soga que le permitirá atravesar hasta los más temibles obstáculos. ¡Solo 10 monedas! ¡Es una oferta de tiempo limitado! Entiéndame, estamos aquí para generar ganancias, ¿cierto? Después de todo, debo cenar esta noche, y mi familia también."`,
       categoria: "Muelle",
       input: false,
       cantidadOpciones: 0,
