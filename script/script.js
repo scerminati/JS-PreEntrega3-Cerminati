@@ -2308,6 +2308,18 @@ function declaracionDeJugadores() {
       logros: 6,
       tiempo: 1105,
     },
+    {
+      nombre: "Lord Anónimo",
+      raza: "Humano",
+      clase: "Caballero",
+      vida: 18,
+      iniciativa: 0,
+      combate: 9,
+      defensa: 5,
+      puntaje: 95,
+      logros: 6,
+      tiempo: 101,
+    },
   ];
 }
 
